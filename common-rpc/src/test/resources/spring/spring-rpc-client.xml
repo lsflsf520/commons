@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd 
+						http://www.springframework.org/schema/context 
+						http://www.springframework.org/schema/context/spring-context.xsd
+						">
+						
+    <context:component-scan base-package="com.yisi.stiku" use-default-filters="false" scoped-proxy="targetClass">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+        <context:include-filter type="annotation" expression="com.yisi.stiku.rpc.annotation.RpcService" />
+    </context:component-scan>	
+	
+	<bean id="nettyClientRouter" class="com.yisi.stiku.rpc.cluster.impl.NettyClientRouter">
+	  <property name="loadBalance" ref="randomLoadBalance"/>
+	</bean>
+	
+	<bean id="randomLoadBalance" class="com.yisi.stiku.rpc.cluster.impl.RandomLoadBalance">
+	  <constructor-arg name="registry" ref="nettyClientRegistry"/>
+	</bean>
+	
+	<bean id="nettyClientRegistry" class="com.yisi.stiku.rpc.cluster.impl.NettyClientRegistry">
+	  <constructor-arg name="discovery" ref="zkDiscovery" />
+	</bean>
+	
+	<bean id="zkDiscovery" class="com.yisi.stiku.rpc.client.netty.ZkServiceDiscovery" >
+	  <!-- 多模块rpc配置demo
+	  <property name="grpModelMap">
+	    <map>
+	      <entry key="mgr">
+	        <set>
+	          <value>ms</value>
+	        </set>
+	      </entry>
+	    </map>
+	  </property>
+	   -->
+	  <!--<property name="ignoreDefaultGrp" value="true"/>  强制忽略默认组下的服务 -->
+	  <!--<property name="ignoreDefaultMod" value="true"/>  强制忽略默认模块下的服务 -->
+	</bean>
+	
+	<bean id="helloService" class="com.yisi.stiku.rpc.client.netty.RpcClientFactoryBean">
+	  <constructor-arg name="router" ref="nettyClientRouter"/>  
+	  <constructor-arg name="rpcInterface" value="com.yisi.stiku.rpc.test.HelloRpcService" />
+	</bean>
+</beans>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+<configuration scan="false">
+
+    <property name="logBaseDir" value="./logs" />
+    <property name="logName" value="web-ms" />
+    <conversionRule conversionWord="ip" converterClass="com.yisi.stiku.log.IPConverter" />
+    <conversionRule conversionWord="msgId" converterClass="com.yisi.stiku.log.MsgIdConverter" />
+    
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<Encoding>UTF-8</Encoding>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<param name="Pattern"
+				value="%d{yyyy-MM-dd HH:mm:ss} %contextName %p ${logName} [%logger{36}] %msg%n" />
+		</layout>
+	</appender>
+
+	<!-- 系统日志文件 -->
+	<appender name="SYS_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logBaseDir}/sys/${logName}_%d{yyyyMMdd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder charset="UTF-8">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %p ${logName} %msgId %ip %c %m%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 性能日志文件 -->
+	<appender name="XN_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logBaseDir}/xn/${logName}_%d{yyyyMMdd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder charset="UTF-8">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %d{yyyyMMddHHmmssSSS} %m%n</pattern>
+		</encoder>
+	</appender>
+	
+	<!-- 操作日志文件 -->
+	<appender name="OPER_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logBaseDir}/oper/${logName}_%d{yyyyMMdd}.log</fileNamePattern>
+		</rollingPolicy>
+		<encoder charset="UTF-8">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} %msgId %m%n</pattern>
+		</encoder>
+	</appender>
+
+    <logger name="xnLogger" level="info" additivity="false">
+      <appender-ref ref="XN_LOG" />
+    </logger>
+    
+    <logger name="operLogger" level="info" additivity="false">
+      <appender-ref ref="OPER_LOG" />
+    </logger>
+ 
+	<logger name="com.yisi.stiku" level="debug" additivity="false">
+	  <appender-ref ref="STDOUT" />
+	  <appender-ref ref="SYS_LOG" />
+	</logger>
+	
+	<logger name="org.hibernate.engine.jdbc" level="debug" additivity="false">
+	  <appender-ref ref="STDOUT" />
+	  <appender-ref ref="SYS_LOG" />
+	</logger>
+	
+	<logger name="com.yisi.stiku.rpc.client.netty.handler.HeartBeatReqHandler" level="INFO" additivity="false">
+	  <appender-ref ref="STDOUT" />
+	  <appender-ref ref="SYS_LOG" />
+	</logger>
+	
+	<logger name="com.yisi.stiku.rpc.server.netty.handler.HeartBeatRespHandler" level="INFO" additivity="false">
+	  <appender-ref ref="STDOUT" />
+	  <appender-ref ref="SYS_LOG" />
+	</logger>
+
+	<logger name="com.yisi.stiku.core.audit.SaveUpdateAuditListener" level="WARN" additivity="false">
+	  <appender-ref ref="STDOUT" />
+	  <appender-ref ref="SYS_LOG" />
+	</logger>
+	
+	<!-- root logger -->
+	<root level="ERROR">
+	    <appender-ref ref="STDOUT" />
+	    <appender-ref ref="SYS_LOG" />
+	</root>
+	
+</configuration>

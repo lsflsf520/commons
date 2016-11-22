@@ -1,0 +1,48 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.yisi.stiku</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>common-parent</artifactId>
+	<packaging>pom</packaging>
+	<name>common-parent</name>
+
+    <modules>
+      <module>common-rpc</module>
+      <module>common-statbg</module>
+      <module>common-utils</module>
+      <module>common-webutils</module>
+      <module>common-db</module>  
+      <module>common-config</module>
+      <module>common-logger</module>
+      <module>common-cache</module>
+    </modules>
+    
+    <repositories>
+		<repository>
+			<id>public</id>
+			<name>Public Mirror</name>
+			<url>http://nexus.17daxue.com/nexus/content/groups/public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>Snapshots</id>
+			<name>Public Mirror</name>
+			<url>http://nexus.17daxue.com/nexus/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+    
+</project>

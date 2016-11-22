@@ -1,0 +1,15 @@
+target
+target/*
+src/webapp/WEB-INF/lib/*
+src/webapp/WEB-INF/classes/*
+*.class
+.project
+.settings/*
+.settings
+.classpath
+src/main/webapp/META-INF/*
+rebel.xml
+bin/*
+/*/*/.gitignore
+/*/*/*/.gitignore
+*.log

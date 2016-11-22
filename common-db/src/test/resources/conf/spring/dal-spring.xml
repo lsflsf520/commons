@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+	    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd"
+	default-autowire="byName">
+    <!-- 
+    <bean id="zkResource" class="com.yisi.stiku.conf.zk.ZookeeperResource">
+        <property name="zkNodePaths">
+            <value>teacher/jdbc.properties</value>
+        </property>
+    </bean>
+
+    <bean id="propertyConfig"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="order" value="2" />
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="location" ref="zkResource"/>
+    </bean>
+ -->
+    <context:component-scan base-package="com.yisi.stiku" use-default-filters="false" scoped-proxy="targetClass">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service" />
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Component" />
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Repository" />
+    </context:component-scan>
+	
+	<bean id="testUserService" class="com.yisi.stiku.dbtest.service.impl.TestUserServiceImpl"/>
+ 
+    <bean id="dataSourceMaster" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+          <property name="poolProperties">
+              <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
+                  <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                  <!-- 创建MySQL UTF-8编码数据库脚本：CREATE DATABASE stiku_ms DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; -->
+                  <property name="url" value="jdbc:mysql://192.168.30.91:3306/stiku_stat?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true" />
+                  <property name="username" value="stiku_stat" />
+                  <property name="password" value="17daxue" />
+                  
+                  <property name="maxActive" value="1000"/>  
+                  <property name="initialSize" value="1"/>
+                  <property name="maxWait" value="1000"/>
+                  <property name="maxIdle" value="20"/>
+                  <property name="minIdle" value="3"/>
+                  <property name="removeAbandoned" value="true"/>
+                  <property name="removeAbandonedTimeout" value="180"/>
+                  <property name="testWhileIdle" value="true"/><!-- 打开检查,用异步线程evict进行检查 -->  
+                  <property name="testOnBorrow" value="false"/>
+                  <property name="testOnReturn" value="false"/>  
+                  <property name="validationQuery" value="select 1"/>  
+                  <property name="validationInterval" value="10000"/> 
+                  <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+                  <property name="numTestsPerEvictionRun" value="20"/> 
+              </bean>
+          </property>
+    </bean>
+    
+    <bean id="dataSourceSlave" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+          <property name="poolProperties">
+              <bean class="org.apache.tomcat.jdbc.pool.PoolProperties">
+                  <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+                  <property name="url" value="jdbc:mysql://192.168.30.91:3306/stiku_intg?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true" />
+                  <property name="username" value="stiku_intg" />
+                  <property name="password" value="17daxue" />
+                  
+                  <property name="maxActive" value="1000"/>  
+                  <property name="initialSize" value="1"/>
+                  <property name="maxWait" value="1000"/>
+                  <property name="maxIdle" value="20"/>
+                  <property name="minIdle" value="3"/>
+                  <property name="removeAbandoned" value="true"/>
+                  <property name="removeAbandonedTimeout" value="180"/>
+                  <property name="testWhileIdle" value="true"/>
+                  <property name="testOnBorrow" value="false"/>
+                  <property name="testOnReturn" value="false"/>  
+                  <property name="validationQuery" value="select 1"/>  
+                  <property name="validationInterval" value="10000"/> 
+                  <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+                  <property name="numTestsPerEvictionRun" value="20"/> 
+              </bean>
+          </property>
+    </bean>
+    
+    <!-- 主从配置  -->
+    <bean id="masterSlaveDataSource" class="com.yisi.stiku.db.multi.MasterSlaveDataSource">
+        <property name="masterDataSource" ref="dataSourceMaster"/>
+        <property name="slaveDataSources">
+            <map>
+                <entry key="dataSourceMaster" value-ref="dataSourceMaster"/>
+                <entry key="dataSourceSlave" value-ref="dataSourceSlave"/>
+            </map>
+        </property>
+    </bean>   
+         
+    <!-- 多数据源配置示例  -->
+    <bean id="multipleDataSource" class="com.yisi.stiku.db.multi.MultipleDataSource">
+        <!-- <property name="defaultTargetDataSource" ref="dataSourceMaster"/> -->
+        <property name="targetDataSources">
+            <map>
+                <entry key="dataSourceMaster" value-ref="masterSlaveDataSource"/>
+               <!--  <entry key="dataSourceSlave" value-ref="dataSourceSlave"/> -->
+            </map>
+        </property>
+    </bean>     
+    
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">    
+        <constructor-arg index="0" ref="sqlSessionFactory" />    
+    </bean>    
+      
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+        <property name="dataSource" ref="multipleDataSource" />  
+        <property name="mapperLocations"  
+            value="classpath:conf/mybatis/TestUserMapper.xml" />  
+    </bean>  
+  
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="com.yisi.stiku.dbtest.dao" />  
+        <property name="markerInterface" value="com.yisi.stiku.db.dao.BaseDao"/>
+    </bean>  
+  <!-- 
+	<bean id="userExtDao" class="com.yisi.stiku.dbtest.dao.impl.TestUserDaoImpl"/>
+	 -->
+	 
+	 <tx:annotation-driven transaction-manager="testTransactionManager" proxy-target-class="true" />
+    <!-- 事务管理器 -->  
+    <bean id="testTransactionManager"  
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="multipleDataSource" />  
+    </bean> 
+</beans>

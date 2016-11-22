@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   	http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd
+   	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+   	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+   <import resource="spring-dataSource.xml"/>
+
+   <bean id="startTime" class="com.yisi.stiku.statbg.param.DateParam">
+     <property name="time" value="-10"/>
+     <property name="timeUnit" value="DAYS"/>
+   </bean>
+   
+   <bean id="thirdDel" class="com.yisi.stiku.statbg.sql.ModifySqlStat">
+     <property name="dataSource" ref="resultDataSource" />
+     <property name="orderNO" value="0" />
+     <property name="outputKey" value="rsDelRs" />
+     <property name="sql">
+       <value>
+	       <![CDATA[
+	          delete from tmp_tbl where stat_date = ${startTime}
+	       ]]>
+       </value>
+     </property>
+   </bean>
+   
+   <bean id="thirdInsert" class="com.yisi.stiku.statbg.sql.ModifySqlStat">
+     <property name="dataSource" ref="resultDataSource" />
+     <property name="orderNO" value="3" />
+     <property name="outputKey" value="rsInsertMapRs" />
+     <property name="sql">
+       <value>
+         
+	       <![CDATA[
+	          insert into tmp_tbl(user_id, login_time, stat_date)
+	           values(${loginTimeMapRs.user_id},
+	                ${loginTimeMapRs.loginTime}, ${startTime})
+	       ]]>
+	        
+	        <!--
+	        <![CDATA[
+	          insert into tmp_tbl(source_id, source_type, order_id, total_price, create_time)
+	           values(${unionListRs.0},
+	                ${unionListRs.1}, ${unionListRs.2}, ${unionListRs.3},${unionListRs.4})
+	       ]]>
+	       -->
+       </value>
+     </property>
+   </bean>
+   
+   <bean id="firstSelect" class="com.yisi.stiku.statbg.sql.SelectMapLineSqlStat">
+     <property name="dataSource" ref="stikuDataSource" />
+     <property name="orderNO" value="1" />
+     <property name="outputKey" value="loginTimeMapRs" />
+     <property name="sql">
+       <value>
+	       <![CDATA[
+	          select user_id, sum(UNIX_TIMESTAMP(logout_time) - UNIX_TIMESTAMP(logon_time)) as loginTime from tb_login_log 
+	           where logon_time > ${startTime} and not logout_time is null
+	           group by user_id
+	       ]]>
+       </value>
+     </property>
+   </bean>
+   
+    <!-- <bean id="secondSelect" class="com.yisi.stiku.statbg.sql.SelectListLineSqlStat">
+     <property name="dataSource" ref="stikuDataSource" />
+     <property name="orderNO" value="2" />
+     <property name="outputKey" value="unionListRs" />
+     <property name="sql">
+       <value>
+	       <![CDATA[
+	          select source_id, source_type, order_id, total_price, create_time from union_order where create_time > ${startTime}
+	       ]]>
+       </value>
+     </property>
+   </bean> -->
+   
+   
+   <bean id="testRight" class="com.yisi.stiku.statbg.sql.SelectMapLineSqlStat">
+     <property name="dataSource" ref="stikuDataSource" />
+     <property name="orderNO" value="573" />
+     <property name="outputKey" value="testRightRs" />
+     <property name="sql">
+       <value>
+	       <![CDATA[
+	          select index_no indexNo, count(1) rightCnt from tb_week_test_problem where is_grasp = 1 group by index_no order by index_no asc
+	       ]]>
+       </value>
+     </property>
+   </bean>
+   
+   <!-- MapDataJoinTransverter 使用的例子  开始-->
+   <!-- <bean id="testWrong" class="com.yisi.stiku.statbg.sql.SelectMapLineSqlStat">
+     <property name="dataSource" ref="stikuDataSource" />
+     <property name="orderNO" value="574" />
+     <property name="outputKey" value="testWrongRs" />
+     <property name="sql">
+       <value>
+	       <![CDATA[
+	          select index_no indexNo, count(1) wrongCnt from tb_week_test_problem where is_grasp = 0 group by index_no order by index_no asc
+	       ]]>
+       </value>
+     </property>
+   </bean>
+   
+   <bean id="testAvgScore" class="com.yisi.stiku.statbg.sql.SelectMapLineSqlStat">
+     <property name="dataSource" ref="stikuDataSource" />
+     <property name="orderNO" value="575" />
+     <property name="outputKey" value="testAvgRs" />
+     <property name="sql">
+       <value>
+	       <![CDATA[
+	          select index_no indexNo, sum(grasp_score)/sum(score) avgScore from tb_week_test_problem  group by index_no order by index_no asc
+	       ]]>
+       </value>
+     </property>
+   </bean>
+   
+   <bean id="joinData" class="com.yisi.stiku.statbg.transverter.MapDataJoinTransverter">
+     <property name="orderNO" value="576" />
+     <property name="outputKey" value="joinDataRs" />
+     <property name="targetKeyMap">
+       <map>
+         <entry key="testRightRs" value="indexNo" />
+         <entry key="testWrongRs" value="indexNo" />
+         <entry key="testAvgRs" value="indexNo" />
+       </map>
+     </property>
+    </bean> -->
+    <!-- MapDataJoinTransverter 使用的例子  结束-->
+   
+</beans>
