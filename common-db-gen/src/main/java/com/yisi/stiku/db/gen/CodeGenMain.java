@@ -9,7 +9,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.mybatis.generator.api.ShellRunner;
 import org.springframework.util.StringUtils;
 
-import com.yisi.stiku.conf.BaseConfig;
+import com.ujigu.secure.common.utils.BaseConfig;
 
 /**
  * // * @see http://reform.mop.com/wiki/pages/viewpage.action?pageId=13239200

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <!-- 配置详解地址：http://blog.csdn.net/isea533/article/details/42102297 -->
+    <properties resource="new/application.properties" />
+    <context id="DB2Tables" targetRuntime="MyBatis3" defaultModelType="flat">
+    <!-- 
+        <plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+            <property name="searchString" value="Mapper$"/>
+            <property name="replaceString" value="Dao"/>
+        </plugin>
+ -->
+        <plugin type="com.yisi.stiku.db.newgen.CodeGenPlug"/>
+
+        <commentGenerator>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="${jdbc.url}"
+                        userId="${jdbc.username}" 
+                        password="${jdbc.password}">
+        </jdbcConnection>
+
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--java bean，数据库实体-->
+        <javaModelGenerator targetPackage="${java.package.rootpath}.entity"
+                            targetProject="${source.file.path}">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--mybatis的mapper.mxl文件-->
+        <sqlMapGenerator targetPackage="${java.package.rootpath}.mapper"
+                         targetProject="${source.file.path}">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+
+        <!--dao类-->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="${java.package.rootpath}.dao" 
+                             targetProject="${source.file.path}">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        
+        <!-- <table tableName="card_type" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+        </table>
+        
+        <table tableName="card_level" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+        </table>
+        
+        <table tableName="bank" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="check_state" javaType="com.ujigu.card.common.constant.CheckState" />
+        </table> 
+        
+        <table tableName="privilege" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+        </table> 
+        
+        <table tableName="redpack_invite_log" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="first_cast" javaType="com.ujigu.secure.common.bean.Bool" />
+        </table>
+        
+        <table tableName="channel_jiesuan" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+              <columnOverride column="data_type" javaType="com.ujigu.p2p.common.constant.RegSrc" />
+              <columnOverride column="status" javaType="com.ujigu.p2p.common.constant.JiesuanState" />
+        </table>
+        -->
+        
+        
+        
+       <table tableName="card_detail" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="bank_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="atm_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="card_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="net_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="lkl_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="ali_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="phone_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+        </table>
+        
+        <!--<table tableName="card_detail" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="bank_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="atm_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="card_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="net_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="lkl_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="ali_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="phone_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+        </table>
+        
+        <table tableName="user_log" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+               <columnOverride column="log_type" javaType="com.ujigu.card.common.constant.LogType" />
+        </table>
+         -->
+        
+         <!-- <table tableName="grade_rule" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+               <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />    
+               <columnOverride column="relation" javaType="com.ujigu.secure.agent.constant.GdRelation" />  
+               <columnOverride column="grade_fee_type" javaType="com.ujigu.secure.agent.constant.GdFeeType" />  
+        </table>
+        <table tableName="data_day_user" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        <table tableName="data_day_depart" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        <table tableName="data_day_company" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        <table tableName="data_day_ad_plan" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        <table tableName="data_day_ac_plan" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        <table tableName="data_day_ad_ic" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        <table tableName="data_day_ac_ic" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        
+          <table tableName="test_user" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false" domainObjectName="User">
+           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />       
+        </table> -->
+    </context>
+</generatorConfiguration>

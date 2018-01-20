@@ -19,7 +19,7 @@ import org.mybatis.generator.api.dom.xml.TextElement;
 import org.mybatis.generator.api.dom.xml.XmlElement;
 import org.springframework.util.StringUtils;
 
-import com.yisi.stiku.conf.BaseConfig;
+import com.ujigu.secure.common.utils.BaseConfig;
 
 import java.util.Arrays;
 import java.util.List;
@@ -421,7 +421,7 @@ public class CodeGenPlug extends PluginAdapter {
     	String baseClzzImplNameWithGeneric = baseClzzImplName + "<" + pkType + "," + entityName + ">";
     	String javaRootPkg = BaseConfig.getValue("java.package.rootpath");
     	
-    	TopLevelClass daoImplClass = new TopLevelClass(javaRootPkg + "."+classSuffix.toLowerCase()+".impl." + javaType.getShortName() + classSuffix + "Impl");
+    	TopLevelClass daoImplClass = new TopLevelClass(javaRootPkg + "."+classSuffix.toLowerCase()+".impl." + javaType.getShortName() + classSuffix + ("Dao".equals(classSuffix) ? "Impl" : ""));
     	daoImplClass.setVisibility(JavaVisibility.PUBLIC);
     	daoImplClass.addAnnotation("@" + annotationName);
     	

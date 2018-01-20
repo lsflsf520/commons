@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:p="http://cxf.apache.org/policy" xmlns:ss="http://www.springframework.org/schema/security"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+   	http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+   	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+   	http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd
+   	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+   	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+   	http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
+   	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+   	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+   	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+   	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:component-scan base-package="com.ujigu.secure.web.common.action,com.ujigu.secure.email,com.ujigu.secure.ipdata,com.ujigu.secure.sms,com.ujigu.secure.upfile,com.ujigu.secure.vcode,com.ujigu.secure.tools"
+		use-default-filters="false" scoped-proxy="targetClass">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+    <!--<mvc:resources mapping="/crossdomain.xml" location="/crossdomain.xml"/>-->
+    <mvc:annotation-driven>
+       <mvc:message-converters register-defaults="true">  
+         <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+         <property name="prefixJson" value="false"/>  
+         <property name="supportedMediaTypes">  
+             <list>  
+               <value>application/json</value>  
+               <value>text/json</value>  
+             </list>  
+          </property>  
+       </bean>  
+     </mvc:message-converters>
+    </mvc:annotation-driven>
+    
+    <mvc:resources mapping="/crossdomain.xml" location="/crossdomain.xml" />
+    <mvc:resources location="/" mapping="/dl/**"/>
+
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize">
+			<value>33554432</value> <!-- 32M -->
+		</property>
+		<property name="maxInMemorySize">
+			<value>4096</value>
+		</property>
+	</bean>
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="2" />
+		<property name="prefix" value="/WEB-INF/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	
+	<bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha" scope="singleton">
+	    <property name="config">
+	        <bean class="com.google.code.kaptcha.util.Config">
+	            <constructor-arg>
+	                <!-- 
+    kaptcha.border  是否有边框  默认为true  我们可以自己设置yes，no  
+    kaptcha.border.color   边框颜色   默认为Color.BLACK  
+    kaptcha.border.thickness  边框粗细度  默认为1  
+    kaptcha.producer.impl   验证码生成器  默认为DefaultKaptcha  
+    kaptcha.textproducer.impl   验证码文本生成器  默认为DefaultTextCreator  
+    kaptcha.textproducer.char.string   验证码文本字符内容范围  默认为abcde2345678gfynmnpwx  
+    kaptcha.textproducer.char.length   验证码文本字符长度  默认为5  
+    kaptcha.textproducer.font.names    验证码文本字体样式  默认为new Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)  
+    kaptcha.textproducer.font.size   验证码文本字符大小  默认为40  
+    kaptcha.textproducer.font.color  验证码文本字符颜色  默认为Color.BLACK  
+    kaptcha.textproducer.char.space  验证码文本字符间距  默认为2  
+    kaptcha.noise.impl    验证码噪点生成对象  默认为DefaultNoise  
+    kaptcha.noise.color   验证码噪点颜色   默认为Color.BLACK  
+    kaptcha.obscurificator.impl   验证码样式引擎  默认为WaterRipple  
+    kaptcha.word.impl   验证码文本字符渲染   默认为DefaultWordRenderer  
+    kaptcha.background.impl   验证码背景生成器   默认为DefaultBackground  
+    kaptcha.background.clear.from   验证码背景颜色渐进   默认为Color.LIGHT_GRAY  
+    kaptcha.background.clear.to   验证码背景颜色渐进   默认为Color.WHITE  
+    kaptcha.image.width   验证码图片宽度  默认为200  
+    kaptcha.image.height  验证码图片高度  默认为50
+	                 -->
+	                <props>
+	                	<!-- 无边框 -->
+	                    <prop key="kaptcha.border">no</prop>
+	                    <prop key="kaptcha.textproducer.font.color">black</prop>
+	                    <!-- 渲染效果：水纹：WaterRipple；鱼眼：FishEyeGimpy；阴影：ShadowGimpy -->
+	                    <prop key="kaptcha.obscurificator.impl">com.google.code.kaptcha.impl.ShadowGimpy</prop>
+	                    <!-- 不要噪点 -->
+	                    <prop key="kaptcha.noise.impl">com.google.code.kaptcha.impl.DefaultNoise</prop>
+	                    <prop key="kaptcha.image.width">90</prop>
+	                    <prop key="kaptcha.image.height">33</prop>
+	                    <prop key="kaptcha.textproducer.font.size">25</prop>
+	                    <prop key="kaptcha.textproducer.char.length">4</prop>
+	                    <prop key="kaptcha.textproducer.char.space">5</prop>
+	                    <!-- 和登录框背景颜色一致 -->
+	                    <prop key="kaptcha.background.clear.from">247,247,247</prop>
+	                    <prop key="kaptcha.background.clear.to">247,247,247</prop>
+	                </props>
+	            </constructor-arg>
+	        </bean>
+	    </property>
+	</bean>
+
+	<!-- <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/file/saveRuleImg" />
+            <mvc:mapping path="/file/uploadImg" />
+
+            <bean class="com.mlcs.mop.upimg.interceptor.SecureInterceptor" />
+        </mvc:interceptor>
+    </mvc:interceptors> -->
+</beans>

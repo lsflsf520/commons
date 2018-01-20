@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ujigu.acl.dao.WorkerFuncDao" >
+  <resultMap id="BaseResultMap" type="com.ujigu.acl.entity.WorkerFunc" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="worker_id" property="workerId" jdbcType="INTEGER" />
+    <result column="func_id" property="funcId" jdbcType="INTEGER" />
+    <result column="webapp_id" property="webappId" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="BaseColumnList" >
+    id, worker_id, func_id, webapp_id, create_time
+  </sql>
+  <select id="findByPK" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="BaseColumnList" />
+    from worker_func
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPK" parameterType="java.lang.Integer" >
+    delete from worker_func
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ujigu.acl.entity.WorkerFunc" >
+    insert into worker_func (id, worker_id, func_id, 
+      webapp_id, create_time)
+    values (#{id,jdbcType=INTEGER}, #{workerId,jdbcType=INTEGER}, #{funcId,jdbcType=INTEGER}, 
+      #{webappId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPK" parameterType="com.ujigu.acl.entity.WorkerFunc" >
+    update worker_func
+    <set >
+      <if test="workerId != null" >
+        worker_id = #{workerId,jdbcType=INTEGER},
+      </if>
+      <if test="funcId != null" >
+        func_id = #{funcId,jdbcType=INTEGER},
+      </if>
+      <if test="webappId != null" >
+        webapp_id = #{webappId,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertReturnPK" useGeneratedKeys="true" keyProperty="id" parameterType="com.ujigu.acl.entity.WorkerFunc" >
+    insert into worker_func (id, worker_id, func_id, 
+      webapp_id, create_time)
+    values (#{id,jdbcType=INTEGER}, #{workerId,jdbcType=INTEGER}, #{funcId,jdbcType=INTEGER}, 
+      #{webappId,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into worker_func
+		(id,worker_id,func_id,webapp_id,create_time)
+	values 
+	<foreach collection="list" item="item" separator="," index="index">
+		(#{item.id,jdbcType=INTEGER},#{item.workerId,jdbcType=INTEGER},#{item.funcId,jdbcType=INTEGER},#{item.webappId,jdbcType=INTEGER},#{item.createTime,jdbcType=TIMESTAMP})
+	</foreach>
+  </insert>
+  <delete id="batchDel" >
+    		delete from worker_func
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")">
+				#{item,jdbcType=INTEGER}
+			</foreach>
+  </delete>
+  <update id="updateStatus" >
+    		update worker_func
+			set ${statusColName} = #{delStatusVal, jdbcType=INTEGER}
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")">
+				#{item,jdbcType=INTEGER}
+			</foreach>
+  </update>
+  <select id="findByPks" resultMap="BaseResultMap" >
+    		select 
+			<include refid="BaseColumnList" />
+			from worker_func
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")"> 
+					#{item,jdbcType=INTEGER}
+				</foreach>
+  </select>
+  <select id="findAll" resultMap="BaseResultMap" >
+    select
+		<include refid="BaseColumnList"/>
+	from worker_func
+	<where>
+		<trim suffixOverrides="and" >
+			<if test="id != null and id > 0" >
+				and id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="workerId != null and workerId > 0" >
+				and worker_id = #{workerId,jdbcType=INTEGER}
+			</if>
+			<if test="funcId != null and funcId > 0" >
+				and func_id = #{funcId,jdbcType=INTEGER}
+			</if>
+			<if test="webappId != null and webappId > 0" >
+				and webapp_id = #{webappId,jdbcType=INTEGER}
+			</if>
+			<!--<if test="queryParam != null">
+				<if test="queryParam.startDate != null and queryParam.startDate != '' and queryParam.endDate != null and queryParam.endDate != ''">
+					and create_time between #{queryParam.startDate, jdbcType=VARCHAR} and #{queryParam.endDate, jdbcType=VARCHAR}
+				</if>
+				<if test="queryParam.keyword != null and queryParam.keyword != ''">
+					and (name like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') or other_col like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') )
+				</if>
+			</if>-->
+		</trim>
+	</where>
+  </select>
+</mapper>

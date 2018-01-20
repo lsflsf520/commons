@@ -48,10 +48,13 @@
         </javaClientGenerator>
         
         
-        <table tableName="class_fenban_problem_data" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="budget_info" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
-               
-       <!--  <table tableName="integration" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="budget_select" enableCountByExample="false" enableUpdateByExample="false"
+        		enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+       <!--   <table tableName="wallet_record" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>         
+         <table tableName="integration" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
          <table tableName="dev_demand" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>

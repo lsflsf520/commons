@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ujigu.acl.dao.WorkerDao" >
+  <resultMap id="BaseResultMap" type="com.ujigu.acl.entity.Worker" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="passwd" property="passwd" jdbcType="CHAR" />
+    <result column="phone" property="phone" jdbcType="CHAR" />
+    <result column="qq" property="qq" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="head_img" property="headImg" jdbcType="VARCHAR" />
+    <result column="descp" property="descp" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="last_uptime" property="lastUptime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="BaseColumnList" >
+    id, name, passwd, phone, qq, email, head_img, descp, status, create_time, last_uptime
+  </sql>
+  <select id="findByPK" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="BaseColumnList" />
+    from worker
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPK" parameterType="java.lang.Integer" >
+    delete from worker
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ujigu.acl.entity.Worker" >
+    insert into worker (id, name, passwd, 
+      phone, qq, email, head_img, 
+      descp, status, create_time, 
+      last_uptime)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{passwd,jdbcType=CHAR}, 
+      #{phone,jdbcType=CHAR}, #{qq,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{headImg,jdbcType=VARCHAR}, 
+      #{descp,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastUptime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPK" parameterType="com.ujigu.acl.entity.Worker" >
+    update worker
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="passwd != null" >
+        passwd = #{passwd,jdbcType=CHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=CHAR},
+      </if>
+      <if test="qq != null" >
+        qq = #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="headImg != null" >
+        head_img = #{headImg,jdbcType=VARCHAR},
+      </if>
+      <if test="descp != null" >
+        descp = #{descp,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="lastUptime != null" >
+        last_uptime = #{lastUptime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertReturnPK" useGeneratedKeys="true" keyProperty="id" parameterType="com.ujigu.acl.entity.Worker" >
+    insert into worker (id, name, passwd, 
+      phone, qq, email, head_img, 
+      descp, status, create_time, 
+      last_uptime)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{passwd,jdbcType=CHAR}, 
+      #{phone,jdbcType=CHAR}, #{qq,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{headImg,jdbcType=VARCHAR}, 
+      #{descp,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{lastUptime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into worker
+		(id,name,passwd,phone,qq,email,head_img,descp,status,create_time,last_uptime)
+	values 
+	<foreach collection="list" item="item" separator="," index="index">
+		(#{item.id,jdbcType=INTEGER},#{item.name,jdbcType=VARCHAR},#{item.passwd,jdbcType=CHAR},#{item.phone,jdbcType=CHAR},#{item.qq,jdbcType=VARCHAR},#{item.email,jdbcType=VARCHAR},#{item.headImg,jdbcType=VARCHAR},#{item.descp,jdbcType=VARCHAR},#{item.status,jdbcType=CHAR},#{item.createTime,jdbcType=TIMESTAMP},#{item.lastUptime,jdbcType=TIMESTAMP})
+	</foreach>
+  </insert>
+  <delete id="batchDel" >
+    		delete from worker
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")">
+				#{item,jdbcType=INTEGER}
+			</foreach>
+  </delete>
+  <update id="updateStatus" >
+    		update worker
+			set ${statusColName} = #{delStatusVal, jdbcType=INTEGER}
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")">
+				#{item,jdbcType=INTEGER}
+			</foreach>
+  </update>
+  <select id="findByPks" resultMap="BaseResultMap" >
+    		select 
+			<include refid="BaseColumnList" />
+			from worker
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")"> 
+					#{item,jdbcType=INTEGER}
+				</foreach>
+  </select>
+  <select id="findAll" resultMap="BaseResultMap" >
+    select
+		<include refid="BaseColumnList"/>
+	from worker
+	<where>
+		<trim suffixOverrides="and" >
+			<if test="id != null and id > 0" >
+				and id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="name != null and name != ''" >
+				and name = #{name,jdbcType=VARCHAR}
+			</if>
+			<if test="passwd != null and passwd != ''" >
+				and passwd = #{passwd,jdbcType=CHAR}
+			</if>
+			<if test="phone != null and phone != ''" >
+				and phone = #{phone,jdbcType=CHAR}
+			</if>
+			<if test="qq != null and qq != ''" >
+				and qq = #{qq,jdbcType=VARCHAR}
+			</if>
+			<if test="email != null and email != ''" >
+				and email = #{email,jdbcType=VARCHAR}
+			</if>
+			<if test="headImg != null and headImg != ''" >
+				and head_img = #{headImg,jdbcType=VARCHAR}
+			</if>
+			<if test="descp != null and descp != ''" >
+				and descp = #{descp,jdbcType=VARCHAR}
+			</if>
+			<if test="status != null" >
+				and status = #{status,jdbcType=CHAR}
+			</if>
+			and status != 'DELETED'
+			<!--<if test="queryParam != null">
+				<if test="queryParam.startDate != null and queryParam.startDate != '' and queryParam.endDate != null and queryParam.endDate != ''">
+					and create_time between #{queryParam.startDate, jdbcType=VARCHAR} and #{queryParam.endDate, jdbcType=VARCHAR}
+				</if>
+				<if test="queryParam.keyword != null and queryParam.keyword != ''">
+					and (name like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') or other_col like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') )
+				</if>
+			</if>-->
+		</trim>
+	</where>
+  </select>
+  
+  <resultMap id="BaseVOResultMap" type="com.ujigu.acl.vo.WorkerVO" extends="BaseResultMap">
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="depart_id" property="departId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <select id="findWorkerVOByPage" resultMap="BaseVOResultMap" >
+    select w.*, wdr.depart_id, wdr.role_id
+    from worker w, worker_depart_role wdr 
+    where w.id = wdr.worker_id and status != 'DELETED'
+      and wdr.depart_id in 
+        <foreach collection="departIds" item="item" separator="," open="(" close=")"> 
+			#{item,jdbcType=INTEGER}
+		</foreach>
+      <trim suffixOverrides="and" >
+        <if test="entity.status != null" >
+			and status = #{entity.status,jdbcType=CHAR}
+		</if>
+		<if test="entity.queryParam != null">
+          <if test="entity.queryParam.keyword != null and entity.queryParam.keyword != ''">
+            and (name like concat('%', #{entity.queryParam.keyword, jdbcType=VARCHAR}, '%') or phone like concat('%', #{entity.queryParam.keyword, jdbcType=VARCHAR}, '%') or email like concat('%', #{entity.queryParam.keyword, jdbcType=VARCHAR}, '%')  )
+          </if>
+          <if test="entity.queryParam.roleId != null and entity.queryParam.roleId > 0">
+            and wdr.role_id = #{entity.queryParam.roleId,jdbcType=INTEGER}
+          </if>
+        </if>
+      </trim>
+  </select>
+  
+</mapper>

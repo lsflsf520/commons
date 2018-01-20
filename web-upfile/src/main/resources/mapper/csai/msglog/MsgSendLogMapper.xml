@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ujigu.csai.msglog.dao.MsgSendLogDao" >
+  <resultMap id="BaseResultMap" type="com.ujigu.csai.msglog.entity.MsgSendLog" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="sender" property="sender" jdbcType="VARCHAR" />
+    <result column="to_addr" property="toAddr" jdbcType="VARCHAR" />
+    <result column="tmpl_id" property="tmplId" jdbcType="VARCHAR" />
+    <result column="module" property="module" jdbcType="VARCHAR" />
+    <result column="src_ip" property="srcIp" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="msg_id" property="msgId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="extra_info" property="extraInfo" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="BaseColumnList" >
+    id, sender, to_addr, tmpl_id, module, src_ip, type, msg_id, status, extra_info, create_time
+  </sql>
+  <select id="findByPK" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="BaseColumnList" />
+    from msg_send_log
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPK" parameterType="java.lang.Integer" >
+    delete from msg_send_log
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ujigu.csai.msglog.entity.MsgSendLog" >
+    insert into msg_send_log (id, sender, to_addr, 
+      tmpl_id, module, src_ip, 
+      type, msg_id, status, extra_info, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{sender,jdbcType=VARCHAR}, #{toAddr,jdbcType=VARCHAR}, 
+      #{tmplId,jdbcType=VARCHAR}, #{module,jdbcType=VARCHAR}, #{srcIp,jdbcType=VARCHAR}, 
+      #{type,jdbcType=CHAR}, #{msgId,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, #{extraInfo,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPK" parameterType="com.ujigu.csai.msglog.entity.MsgSendLog" >
+    update msg_send_log
+    <set >
+      <if test="sender != null" >
+        sender = #{sender,jdbcType=VARCHAR},
+      </if>
+      <if test="toAddr != null" >
+        to_addr = #{toAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="tmplId != null" >
+        tmpl_id = #{tmplId,jdbcType=VARCHAR},
+      </if>
+      <if test="module != null" >
+        module = #{module,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null" >
+        src_ip = #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="msgId != null" >
+        msg_id = #{msgId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="extraInfo != null" >
+        extra_info = #{extraInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <insert id="insertReturnPK" useGeneratedKeys="true" keyProperty="id" parameterType="com.ujigu.csai.msglog.entity.MsgSendLog" >
+    insert into msg_send_log (id, sender, to_addr, 
+      tmpl_id, module, src_ip, 
+      type, msg_id, status, extra_info, 
+      create_time)
+    values (#{id,jdbcType=INTEGER}, #{sender,jdbcType=VARCHAR}, #{toAddr,jdbcType=VARCHAR}, 
+      #{tmplId,jdbcType=VARCHAR}, #{module,jdbcType=VARCHAR}, #{srcIp,jdbcType=VARCHAR}, 
+      #{type,jdbcType=CHAR}, #{msgId,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, #{extraInfo,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into msg_send_log
+		(id,sender,to_addr,tmpl_id,module,src_ip,type,msg_id,status,extra_info,create_time)
+	values 
+	<foreach collection="list" item="item" separator="," index="index">
+		(#{item.id,jdbcType=INTEGER},#{item.sender,jdbcType=VARCHAR},#{item.toAddr,jdbcType=VARCHAR},#{item.tmplId,jdbcType=VARCHAR},#{item.module,jdbcType=VARCHAR},#{item.srcIp,jdbcType=VARCHAR},#{item.type,jdbcType=CHAR},#{item.msgId,jdbcType=VARCHAR},#{item.status,jdbcType=CHAR},#{item.extraInfo,jdbcType=VARCHAR},#{item.createTime,jdbcType=TIMESTAMP})
+	</foreach>
+  </insert>
+  <delete id="batchDel" >
+    		delete from msg_send_log
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")">
+				#{item,jdbcType=INTEGER}
+			</foreach>
+  </delete>
+  <update id="updateStatus" >
+    		update msg_send_log
+			set ${statusColName} = #{delStatusVal, jdbcType=INTEGER}
+			where id in 
+				<foreach collection="pks" item="item" separator="," open="(" close=")">
+				#{item,jdbcType=INTEGER}
+			</foreach>
+  </update>
+  <select id="findAll" resultMap="BaseResultMap" >
+    select
+		<include refid="BaseColumnList"/>
+	from msg_send_log
+	<where>
+		<trim suffixOverrides="and" >
+			<if test="id != null" >
+				and id = #{id,jdbcType=INTEGER}
+			</if>
+			<if test="sender != null and sender != ''" >
+				and sender = #{sender,jdbcType=VARCHAR}
+			</if>
+			<if test="toAddr != null and toAddr != ''" >
+				and to_addr = #{toAddr,jdbcType=VARCHAR}
+			</if>
+			<if test="tmplId != null and tmplId != ''" >
+				and tmpl_id = #{tmplId,jdbcType=VARCHAR}
+			</if>
+			<if test="module != null and module != ''" >
+				and module = #{module,jdbcType=VARCHAR}
+			</if>
+			<if test="srcIp != null and srcIp != ''" >
+				and src_ip = #{srcIp,jdbcType=VARCHAR}
+			</if>
+			<if test="type != null" >
+				and type = #{type,jdbcType=CHAR}
+			</if>
+			<if test="msgId != null and msgId != ''" >
+				and msg_id = #{msgId,jdbcType=VARCHAR}
+			</if>
+			<if test="status != null" >
+				and status = #{status,jdbcType=CHAR}
+			</if>
+			<if test="extraInfo != null and extraInfo != ''" >
+				and extra_info = #{extraInfo,jdbcType=VARCHAR}
+			</if>
+			<if test="createTime != null" >
+				and create_time = #{createTime,jdbcType=TIMESTAMP}
+			</if>
+			<!--<if test="queryParam != null">
+				<if test="queryParam.startDate != null and queryParam.startDate != '' and queryParam.endDate != null and queryParam.endDate != ''">
+					and create_time between #{queryParam.startDate, jdbcType=VARCHAR} and #{queryParam.endDate, jdbcType=VARCHAR}
+				</if>
+				<if test="queryParam.keyword != null and queryParam.keyword != ''">
+					and (name like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') or other_col like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') )
+				</if>
+			</if>-->
+		</trim>
+	</where>
+  </select>
+</mapper>
