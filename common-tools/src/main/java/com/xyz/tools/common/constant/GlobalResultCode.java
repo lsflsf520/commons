@@ -1,4 +1,6 @@
-package com.xyz.tools.common.bean;
+package com.xyz.tools.common.constant;
+
+import com.xyz.tools.common.bean.ResultCodeIntf;
 
 public enum GlobalResultCode implements ResultCodeIntf{
 

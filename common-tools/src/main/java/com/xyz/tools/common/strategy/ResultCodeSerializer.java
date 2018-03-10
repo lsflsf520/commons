@@ -13,9 +13,9 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import com.xyz.tools.common.bean.GlobalResultCode;
 import com.xyz.tools.common.bean.ResultCodeIntf;
 import com.xyz.tools.common.bean.ServiceResultCode;
+import com.xyz.tools.common.constant.GlobalResultCode;
 
 /**
  * @author shangfeng

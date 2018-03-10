@@ -1,4 +1,4 @@
-package com.xyz.tools.common.bean;
+package com.xyz.tools.common.constant;
 
 public enum MsgType {
 	

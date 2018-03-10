@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.xyz.tools.common.bean.GlobalResultCode;
 import com.xyz.tools.common.bean.ResultModel;
+import com.xyz.tools.common.constant.GlobalResultCode;
 import com.xyz.tools.web.util.WebUtils;
 
 @Controller

@@ -48,109 +48,83 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         
-        <!-- <table tableName="card_type" enableCountByExample="false" enableUpdateByExample="false"
+         <table tableName="user_coupon" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
+           <columnOverride column="discount_type" javaType="com.fengshang.xiaodianbao.constant.DiscountType" />
+           <columnOverride column="coupon_state" javaType="com.fengshang.xiaodianbao.constant.CouponState" />
         </table>
         
-        <table tableName="card_level" enableCountByExample="false" enableUpdateByExample="false"
+       <!--  <table tableName="data_day_shop" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
         </table>
         
-        <table tableName="bank" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="data_month_shop" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="check_state" javaType="com.ujigu.card.common.constant.CheckState" />
-        </table> 
-        
-        <table tableName="privilege" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
-        </table> 
-        
-        <table tableName="redpack_invite_log" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="first_cast" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
         </table>
         
-        <table tableName="channel_jiesuan" enableCountByExample="false" enableUpdateByExample="false"
+           <table tableName="suggestion" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-              <columnOverride column="data_type" javaType="com.ujigu.p2p.common.constant.RegSrc" />
-              <columnOverride column="status" javaType="com.ujigu.p2p.common.constant.JiesuanState" />
-        </table>
-        -->
-        
-        <table tableName="hangye" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+           <columnOverride column="handled" javaType="com.xyz.tools.common.constant.Bool" />
         </table>
         
-        <table tableName="job" enableCountByExample="false" enableUpdateByExample="false"
+       <table tableName="wallet" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+           <columnOverride column="status" javaType="com.xyz.tools.common.constant.CommonStatus" />
         </table>
         
-        <table tableName="job_classify" enableCountByExample="false" enableUpdateByExample="false"
+         <table tableName="cash_log" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />
+           <columnOverride column="check_state" javaType="com.xyz.tools.common.constant.CommonStatus" />
+           <columnOverride column="cash_state" javaType="com.xyz.tools.common.constant.CashState" />
         </table>
         
-       <!-- <table tableName="card_detail" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="charge_log" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="bank_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="atm_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="card_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="net_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="lkl_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="ali_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="phone_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="ord_state" javaType="com.xyz.tools.common.constant.OrdState" />
+           <columnOverride column="pay_method" javaType="com.xyz.tools.common.constant.PayMethod" />
         </table>
         
-        <table tableName="card_detail" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="custom_order" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-           <columnOverride column="bank_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="atm_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="card_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="net_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="lkl_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="ali_pay" javaType="com.ujigu.secure.common.bean.Bool" />
-           <columnOverride column="phone_pay" javaType="com.ujigu.secure.common.bean.Bool" />
+           <columnOverride column="ord_state" javaType="com.xyz.tools.common.constant.OrdState" />
+           <columnOverride column="pay_method" javaType="com.xyz.tools.common.constant.PayMethod" />
         </table>
         
-        <table tableName="user_log" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="coupon_tmpl" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-               <columnOverride column="log_type" javaType="com.ujigu.card.common.constant.LogType" />
+           <columnOverride column="status" javaType="com.xyz.tools.common.constant.CommonStatus" />
         </table>
-         -->
         
-         <!-- <table tableName="grade_rule" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="shop_coupon" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-               <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />    
-               <columnOverride column="relation" javaType="com.ujigu.secure.agent.constant.GdRelation" />  
-               <columnOverride column="grade_fee_type" javaType="com.ujigu.secure.agent.constant.GdFeeType" />  
+           <columnOverride column="status" javaType="com.xyz.tools.common.constant.CommonStatus" />
         </table>
-        <table tableName="data_day_user" enableCountByExample="false" enableUpdateByExample="false"
+        
+        <table tableName="shop_coupon_num" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
         </table>
-        <table tableName="data_day_depart" enableCountByExample="false" enableUpdateByExample="false"
+        
+        <table tableName="shop_order" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
+           <columnOverride column="ord_state" javaType="com.xyz.tools.common.constant.OrdState" />
+           <columnOverride column="pay_method" javaType="com.xyz.tools.common.constant.PayMethod" />
         </table>
-        <table tableName="data_day_company" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-        </table>
-        <table tableName="data_day_ad_plan" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-        </table>
-        <table tableName="data_day_ac_plan" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-        </table>
-        <table tableName="data_day_ad_ic" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
-        </table>
-        <table tableName="data_day_ac_ic" enableCountByExample="false" enableUpdateByExample="false"
+        
+        <table tableName="district" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
         </table>
         
+        <table tableName="industry" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+           <columnOverride column="status" javaType="com.xyz.tools.common.constant.CommonStatus" />
+        </table>  -->
+        
+        <!-- 
           <table tableName="test_user" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false" domainObjectName="User">
            <columnOverride column="status" javaType="com.ujigu.secure.common.bean.CommonStatus" />       

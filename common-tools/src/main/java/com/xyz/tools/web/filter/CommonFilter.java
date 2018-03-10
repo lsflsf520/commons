@@ -22,9 +22,9 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.util.NestedServletException;
 
-import com.xyz.tools.common.bean.GlobalResultCode;
 import com.xyz.tools.common.bean.ResultModel;
 import com.xyz.tools.common.constant.GlobalConstant;
+import com.xyz.tools.common.constant.GlobalResultCode;
 import com.xyz.tools.common.exception.BaseRuntimeException;
 import com.xyz.tools.common.utils.BaseConfig;
 import com.xyz.tools.common.utils.DateUtil;

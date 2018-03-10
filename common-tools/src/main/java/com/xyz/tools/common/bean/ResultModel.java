@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.gson.Gson;
+import com.xyz.tools.common.constant.GlobalResultCode;
 import com.xyz.tools.common.exception.BaseRuntimeException;
 import com.xyz.tools.common.strategy.ResultCodeSerializer;
 import com.xyz.tools.common.utils.JsonUtil;
