@@ -77,7 +77,7 @@ public class UserLoginUtil {
 		
 		saveUid2Token(currUser.getUid() + "", clientType, token);
 		
-		WebUtils.setHttpOnlyCookie(response, ThreadUtil.TOKEN, token,
+		WebUtils.setHttpOnlyCookie(response, ThreadUtil.TOKEN_KEY, token,
 				remindMe ? WEEK_SECONDS : -1); // cookie默认24小时后失效
 
 		return token;
@@ -321,7 +321,7 @@ public class UserLoginUtil {
 	 */
 	public static String getToken(HttpServletRequest request) {
 
-		return WebUtils.getCookieValue(request, ThreadUtil.TOKEN);
+		return WebUtils.getCookieValue(request, ThreadUtil.TOKEN_KEY);
 	}
 
 	/**

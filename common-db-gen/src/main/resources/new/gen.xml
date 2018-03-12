@@ -48,14 +48,18 @@
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
         
-         <table tableName="user_coupon" enableCountByExample="false" enableUpdateByExample="false"
+        <table tableName="district" enableCountByExample="false" enableUpdateByExample="false"
+               enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>
+        
+       <!--  <table tableName="user_coupon" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
            <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
            <columnOverride column="discount_type" javaType="com.fengshang.xiaodianbao.constant.DiscountType" />
            <columnOverride column="coupon_state" javaType="com.fengshang.xiaodianbao.constant.CouponState" />
         </table>
         
-       <!--  <table tableName="data_day_shop" enableCountByExample="false" enableUpdateByExample="false"
+         <table tableName="data_day_shop" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
            <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
         </table>
@@ -96,11 +100,13 @@
         <table tableName="coupon_tmpl" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
            <columnOverride column="status" javaType="com.xyz.tools.common.constant.CommonStatus" />
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
         </table>
         
         <table tableName="shop_coupon" enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
            <columnOverride column="status" javaType="com.xyz.tools.common.constant.CommonStatus" />
+           <columnOverride column="coupon_type" javaType="com.fengshang.xiaodianbao.constant.CouponType" />
         </table>
         
         <table tableName="shop_coupon_num" enableCountByExample="false" enableUpdateByExample="false"

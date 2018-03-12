@@ -24,7 +24,7 @@ public class ThreadUtil {
 	// private static ThreadLocal<String> traceMsgIds = new
 	// ThreadLocal<String>(); //用户标识某个请求的消息id
 
-	public final static String TOKEN = "tk"; // 需要被存入到cookie中的token的key
+	public final static String TOKEN_KEY = BaseConfig.getValue("sys.session.token.key", "tk"); // 需要被存入到cookie中的token的key
 	public final static String LOGIN_TIME = "lt";
 	private final static String USER_INFO = "uinfo"; //用户存储当前登录对象
 	
@@ -222,12 +222,12 @@ public class ThreadUtil {
 
 	public static void setToken(String token) {
 
-		putIfAbsent(TOKEN, token);
+		putIfAbsent(TOKEN_KEY, token);
 	}
 	
 	public static String getToken() {
 
-		return (String) get(TOKEN);
+		return (String) get(TOKEN_KEY);
 	}
 	
 	public static void setSid(String sid){

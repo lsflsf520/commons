@@ -11,17 +11,8 @@ public enum DefaultCacheNS implements CacheNameSpace{
 	ROLE_FUNC(1800),
 	DATA_PRIV(1800),
 	
-	
-	BASE_AREA(24*60*60), //地区数据
-	BASE_PRODUCTCLASS(30*60), //产品分类，半小时刷新
-	BASE_NEWSCLASS(24*60*60),
-	UNCHECKED_NEWSCLASS(24*60*60),
-	PRODUCT_DATA(24*60*60),
-	PRODUCT_JOB(24*60*60),
-	TRANSFER_PLAN(10*60),
-	RECOMMAND_PLAN(10*60),
-	ACT_RECORD(10*60),
-	UP_COMPANY(10*60),
+	BASE_DISTRICT(24*60*60), //地区数据
+	BASE_INDUSTRY(24*60*60), //行业数据
 	;
 	
 	private final int expireSeconds;

@@ -110,7 +110,7 @@ public class CommonFilter implements Filter {
 		}
 		ThreadUtil.setCurrUrl(currUrl);
 		
-		String token = httpRequest.getParameter("token");
+		String token = httpRequest.getHeader(ThreadUtil.TOKEN_KEY);
 		if (StringUtils.isBlank(token)) {
 			token = UserLoginUtil.getToken(httpRequest);
 		} else {
