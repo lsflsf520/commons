@@ -3,7 +3,7 @@ package com.xyz.tools.web.filter.wrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import com.xyz.tools.common.utils.StringUtil;
+import com.ujigu.secure.common.utils.StringUtil;
 
 /**
  * 参考：http://blog.csdn.net/hithedy/article/details/50630109
@@ -12,12 +12,16 @@ import com.xyz.tools.common.utils.StringUtil;
  */
 public class XssSqlRequestWrapper extends HttpServletRequestWrapper{
 	
-	HttpServletRequest orgRequest = null;
+//	HttpServletRequest orgRequest = null;
 
 	public XssSqlRequestWrapper(HttpServletRequest request) {
 		super(request);
-		this.orgRequest = request;
+//		this.orgRequest = request;
 	}
+	
+	private HttpServletRequest _getHttpServletRequest() {
+        return (HttpServletRequest) super.getRequest();
+    }
 
 	/** 
      * 覆盖getParameter方法，将参数名和参数值都做xss & sql过滤。<br/> 
@@ -26,7 +30,7 @@ public class XssSqlRequestWrapper extends HttpServletRequestWrapper{
      */  
     @Override  
     public String getParameter(String name) {  
-        String value = super.getParameter(stripXSSAndSql(name));  
+        String value = _getHttpServletRequest().getParameter(stripXSSAndSql(name));  
         if (value != null) {  
             value = stripXSSAndSql(value);  
         }  
@@ -41,7 +45,7 @@ public class XssSqlRequestWrapper extends HttpServletRequestWrapper{
     @Override  
     public String getHeader(String name) {  
   
-        String value = super.getHeader(stripXSSAndSql(name));  
+        String value = _getHttpServletRequest().getHeader(stripXSSAndSql(name));  
         if (value != null) {  
             value = stripXSSAndSql(value);  
         }  

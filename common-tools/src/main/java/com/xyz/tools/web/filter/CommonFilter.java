@@ -217,12 +217,14 @@ public class CommonFilter implements Filter {
 				if(th instanceof MaxUploadSizeExceededException || th.getCause() instanceof MaxUploadSizeExceededException){
 					httpResponse.sendRedirect(errorUrl);
 				} else{
-					httpRequest.setAttribute("errorMsg", new BaseRuntimeException(resultCode, "uri:" + servletUri + ","
+					/*httpRequest.setAttribute("errorMsg", new BaseRuntimeException(resultCode, "uri:" + servletUri + ","
 							+ extraMsg, th));
 					httpRequest.setAttribute("friendlyMsg", msg);
 					httpRequest.setAttribute("messageId", ThreadUtil.getTraceMsgId());
 					httpRequest.setAttribute("srcUrl", servletUri);
-					httpRequest.getRequestDispatcher(errorUrl).forward(httpRequest, httpResponse);
+					httpRequest.getRequestDispatcher(errorUrl).forward(httpRequest, httpResponse);*/
+					
+					httpResponse.sendRedirect(errorUrl);
 				}
 			}
 
