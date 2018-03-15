@@ -3,7 +3,8 @@ package com.xyz.tools.web.filter.wrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import com.ujigu.secure.common.utils.StringUtil;
+import com.xyz.tools.common.utils.StringUtil;
+
 
 /**
  * 参考：http://blog.csdn.net/hithedy/article/details/50630109

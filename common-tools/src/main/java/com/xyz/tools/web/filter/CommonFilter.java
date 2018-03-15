@@ -113,6 +113,9 @@ public class CommonFilter implements Filter {
 		String token = httpRequest.getHeader(ThreadUtil.TOKEN_KEY);
 		if (StringUtils.isBlank(token)) {
 			token = UserLoginUtil.getToken(httpRequest);
+			if("true".equals(BaseConfig.getValue("api.web.flag"))) {
+				ThreadUtil.setAppReqFlag();
+			}
 		} else {
 			ThreadUtil.setAppReqFlag(); // 在此设置app请求标识
 		}
