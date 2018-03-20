@@ -183,7 +183,7 @@ abstract public class AbstractBaseService<PK extends Serializable, T extends Bas
 			throw new BaseRuntimeException("ILLEGAL_PARAM", "freeze的参数不能为空");
 		}
 		
-		getBaseDao().updateStatus(null, "status", CommonStatus.FREEZE.name(), pks);
+		getBaseDao().updateStatus(null, "status", CommonStatus.FREEZED.name(), pks);
 		
 		return true;
 	}
