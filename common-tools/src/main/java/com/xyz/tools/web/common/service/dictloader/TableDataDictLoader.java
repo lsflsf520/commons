@@ -1,6 +1,7 @@
 package com.xyz.tools.web.common.service.dictloader;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,7 @@ import com.xyz.tools.web.common.service.DataDictService;
 
 public class TableDataDictLoader extends DataDictLoader {
 	
-	private final static Logger LOG = LoggerFactory.getLogger(TableDataDictLoader.class);
+    private final static Logger LOG = LoggerFactory.getLogger(TableDataDictLoader.class);
 	
 	private DataSource dataSource;
 	private String tableName; //表名 或者 数据库名+表名组合而成
@@ -27,24 +28,8 @@ public class TableDataDictLoader extends DataDictLoader {
 	private String keyName; //作为key的列名
 	private String valueName; //作为值的列名
 	private String condSql; //不用包含 where 关键词
+	private boolean lazyLoad; //是否开启懒加载模式，建议大表都开启懒加载模式
 	private ValueConverter converter;
-	
-	/*private CondSqlGenerator condSqlGenerator;
-	
-	public static interface CondSqlGenerator{
-		
-		public String generate();
-		
-	}
-	
-	public static class AcIdSqlGenerator implements CondSqlGenerator{
-
-		@Override
-		public String generate() {
-			return "ac_id = " + UserLoginUtil.getAcId();
-		}
-		
-	}*/
 	
 	@Override
 	public void execute() {
@@ -55,7 +40,40 @@ public class TableDataDictLoader extends DataDictLoader {
 
 	@Override
 	public Map<String, Serializable> loadData() {
-		Map<String, Serializable> dataMap = new LinkedHashMap<>();
+		if(this.isLazyLoad()){ //如果是懒加载模式，此方法将直接返回一个空的Map，让程序在需要使用数据的时候再加载数据
+			return new HashMap<String, Serializable>();
+		}
+		return loadData(this.condSql);
+	}
+	
+	/**
+	 * 开启懒加载模式的loader会调用此方法
+	 * @param keys
+	 * @return
+	 */
+	public Map<String, Serializable> lazyLoadData(Serializable... keys){
+		String currCondSql = this.condSql;
+		String[] keyColNameArr = null;
+		if(keys != null){
+			if(keys.length != (keyColNameArr = keyName.split(",")).length) {
+				throw new BaseRuntimeException("PARAM_NUM_NOT_MATCH", "参数个数与keyName(" + keyName + "个数不一致)");
+			}
+			String otherCondStr = "";
+			for(int index = 0; index < keyColNameArr.length; index++) {
+				otherCondStr += keyColNameArr[index] + "=" + parseColumnValue(keys[index]);
+				if(index < keyColNameArr.length - 1){
+					otherCondStr += " and ";
+				}
+			}
+			
+			currCondSql = otherCondStr + (StringUtils.isBlank(currCondSql) ? "" : currCondSql);
+		}
+		
+		return loadData(currCondSql);
+	}
+	
+	private Map<String, Serializable> loadData(String condSql) {
+        Map<String, Serializable> dataMap = new LinkedHashMap<>();
 		
 		String whereSql = (StringUtils.isBlank(condSql) ? "" : " where " + condSql);
 		List<Map<String/* fieldName */, Serializable/* value */>> dbDatas = DBDataUtil.loadData(dataSource, "select " + keyName + "," + valueName +" from " + tableName + whereSql);
@@ -112,66 +130,19 @@ public class TableDataDictLoader extends DataDictLoader {
 			}
 		}
 		
-		/*Connection conn = null;
-		Statement stmt = null;
-		ResultSet rs = null;
-		try {
-			conn = dataSource.getConnection();
-			stmt = conn.createStatement();
-			String whereSql = (StringUtils.isBlank(condSql) ? "" : " where " + condSql);
-			rs = stmt.executeQuery("select "+keyName + "," + valueName +" from " + tableName + whereSql);
-			String[] parts = keyName.split(",");
-			while(rs.next()){
-				try{
-					String key = "";
-					if(parts.length > 1){
-						for(String part : parts){
-							String partVal = rs.getString(part.trim());
-							if(StringUtils.isBlank(partVal)){
-								throw new BaseRuntimeException("ILLEGAL_VAL", "val is null for column " + part + " in table " + tableName);
-							}
-							key += partVal + GlobalConstant.SQL_FIELD_SPLITER;
-						}
-						key = key.substring(0, key.length() - GlobalConstant.SQL_FIELD_SPLITER.length()); //去掉末尾的分隔符
-					}else{
-						key = rs.getString(keyName);
-						if(StringUtils.isBlank(key)){
-							throw new BaseRuntimeException("ILLEGAL_VAL", "val is null for column " + keyName + " in table " + tableName);
-						}
-					}
-					String value = rs.getString(valueName);
-					
-					dataMap.put(key, value);
-				} catch (BaseRuntimeException e) {
-					LOG.warn(e.getErrorCode() + "," + e.getFriendlyMsg());
-				}
-			}
-		} catch (SQLException e) {
-			LOG.error(e.getMessage(), e);
-		} finally {
-			if(rs != null){
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
-			if(stmt != null){
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
-			if(conn != null){
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					LOG.error(e.getMessage(), e);
-				}
-			}
-		}*/
 		return dataMap;
+	}
+	
+	private Serializable parseColumnValue(Serializable val) {
+		if (val == null || "null".equalsIgnoreCase(val.toString())) {
+			return "null";
+		} else if (val instanceof String) {
+			val = DBDataUtil.parseVal(val.toString());
+			if(val instanceof String){
+				return "'" + val + "'";
+			}
+		}
+		return val;
 	}
 
 	public String getTableName() {
@@ -202,6 +173,14 @@ public class TableDataDictLoader extends DataDictLoader {
 		if(StringUtils.isNotBlank(valueName)){
 			this.valueName = valueName.trim().toLowerCase();
 		}
+	}
+	
+	public boolean isLazyLoad() {
+		return lazyLoad;
+	}
+
+	public void setLazyLoad(boolean lazyLoad) {
+		this.lazyLoad = lazyLoad;
 	}
 
 	public void setDataSource(DataSource dataSource) {

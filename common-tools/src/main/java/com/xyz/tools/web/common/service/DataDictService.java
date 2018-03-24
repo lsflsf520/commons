@@ -16,6 +16,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.CollectionUtils;
 
 import com.xyz.tools.common.constant.GlobalConstant;
 import com.xyz.tools.common.exception.BaseRuntimeException;
@@ -26,9 +27,8 @@ import com.xyz.tools.mq.receiver.topic.DbMsgTopicHandler;
 import com.xyz.tools.web.common.service.dictloader.DataDictLoader;
 import com.xyz.tools.web.common.service.dictloader.TableDataDictLoader;
 
-
 public class DataDictService implements InitializingBean, DbMsgTopicHandler{
-	private final static Logger LOG = LoggerFactory.getLogger(DataDictService.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DataDictService.class);
 	
 	private List<DataDictLoader> loaders;
 	
@@ -86,13 +86,9 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 		if(isInit){
 			TaskUtil.addTask(loader);
 		}
-//		int intervalMinutes =  loader.getRefreshTime();
-//		if(intervalMinutes > 0){
-//			TaskUtil.execFixedDelay(new DataDictTask(loader), 1, intervalMinutes, TimeUnit.MINUTES);
-//		}
 		
-		String alias = StringUtils.isBlank(loader.getNsAlias()) ? loader.getRealNs() : loader.getNsAlias();
-		loaderMap.put(alias, loader);
+//		String alias = StringUtils.isBlank(loader.getNsAlias()) ? loader.getRealNs() : loader.getNsAlias();
+		loaderMap.put(loader.getRealNs(), loader);
 	}
 	
 	
@@ -102,13 +98,19 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 	 * @param aliasNs 刷新数据
 	 */
 	public void refreshData(String... aliasNs){
-		Set<String> allAlias = alias2NsMap.keySet();
+		Set<String> allAlias = null;
 		if(aliasNs != null && aliasNs.length > 0){
 			allAlias = new HashSet<>(Arrays.asList(aliasNs));
-		} 
+		} else {
+			allAlias = alias2NsMap.keySet();
+		}
 		
 		for(String alias : allAlias){
 			DataDictLoader loader = loaderMap.get(alias);
+			String realNs = null;
+			if(loader == null && StringUtils.isNotBlank((realNs = alias2NsMap.get(alias)))){
+				loader = loaderMap.get(realNs);
+			}
 			if(loader != null){
 				LogUtils.info("refreshData for alias %s", alias);
 				loadDict(loader, false);
@@ -117,12 +119,27 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 	}
 	
 	/**
-	 * 
-	 * @param namespace spring-dict.xml中配置的nsAlias，如果namespace对应的值是一个Map，那么可以使用 namespace.fieldName的形式来获取fieldName对应的值
-	 * @param key 一个或多个字段拼接起来的key，与spring-dict.xml中配置的keyName顺序要保持一致
+	 * 返回数据字典名对应的Map大小
+	 * @param aliasName
 	 * @return
 	 */
-	public String getValue(String namespace, String key){
+	public int getDictMapSize(String aliasName){
+		String realNs = alias2NsMap.get(aliasName);
+		if(StringUtils.isBlank(realNs)){
+			return -1;
+		}
+		Map<String, Serializable> kvMap = dataMap.get(realNs);
+		
+		return kvMap == null ? 0 : kvMap.size();
+	}
+	
+	/**
+	 * 
+	 * @param namespace spring-dict.xml中配置的nsAlias，如果namespace对应的值是一个Map，那么可以使用 namespace.fieldName的形式来获取fieldName对应的值
+	 * @param key 由一个或多个字段组成的唯一键数组，与spring-dict.xml中配置的keyName顺序要保持一致
+	 * @return
+	 */
+	public String getValue(String namespace, Serializable... keys){
 		namespace = namespace.toLowerCase();
 		String fieldName = null;
 		if(namespace.contains(".")){ //如果key是个 xx.yy 的形式，则说明数据字典对应
@@ -135,9 +152,20 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 		}
 		Map<String, Serializable> kvMap = dataMap.get(namespace);
 		if(kvMap != null){
+			String key = buildKey(keys);
 			Serializable valObj = kvMap.get(key);
 			if(valObj == null){
-				return "";
+				DataDictLoader currLoader = loaderMap.get(namespace);
+				TableDataDictLoader tableDictLoader = null;
+				if(currLoader == null || !(currLoader instanceof TableDataDictLoader) || !(tableDictLoader = (TableDataDictLoader)currLoader).isLazyLoad()) {
+					return "";
+				}
+				
+				Map<String, Serializable> currKV = tableDictLoader.lazyLoadData(keys);
+				if(CollectionUtils.isEmpty(currKV) || (valObj = currKV.get(key)) == null) {
+					return "";
+				}
+				kvMap.putAll(currKV);
 			}
 			
 			if(StringUtils.isNotBlank(fieldName)){
@@ -157,7 +185,7 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 			if(StringUtils.isNotBlank(fieldName)){
 				realNs = realNs + "." + fieldName;
 			}
-			return getValue(realNs, key);
+			return getValue(realNs, keys);
 		}
 		
 		return "";
@@ -168,10 +196,10 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 	 * @param args
 	 * @return
 	 */
-	public String buildKey(String... args){
+	private String buildKey(Serializable... args){
 		String key = "";
 		if(args != null && args.length > 0){
-		    for(String arg : args){
+		    for(Object arg : args){
 			    key += arg + GlobalConstant.SQL_FIELD_SPLITER;
 		    }
 		    key = key.substring(0, key.length() - GlobalConstant.SQL_FIELD_SPLITER.length()); //去掉末尾的分隔符
@@ -229,14 +257,15 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 	/**
 	 * 
 	 * @param namespace spring-dict.xml中配置的nsAlias，如果namespace对应的值是一个Map，那么可以使用 namespace.fieldName的形式来获取fieldName对应的值
-	 * @param suffix 字典值中的key的后缀，返回的Map的key中，会剔除掉suffix。比如 有如下数据字典：
-	 *                 baseInfo -> name,company -> value
-	 *           如果指定的namespace为baseInfo， suffix为company, 那么返回的Map就是   name -> value
+	 * @param suffixVals 字典值中的key的后缀列表，返回的Map的key中，会剔除掉suffixVals包含的值部分。比如 有如下数据字典：
+	 *                 namespace -> field1,field2 -> value
+	 *           那么 getKVMap(namespace, field2)，将返回  field1 -> value 组成的Map
 	 * @return
 	 */
-	public Map<String, Serializable> getKVMap(String namespace, String suffix){
+	public Map<String, Serializable> getKVMap(String namespace, Serializable... suffixVals){
 		Map<String, Serializable> kvMap = getKVMap(namespace);
-		if(StringUtils.isNotBlank(suffix)){
+		if(suffixVals != null && suffixVals.length > 0){
+			String suffix = buildKey(suffixVals);
 			if(!suffix.startsWith(GlobalConstant.SQL_FIELD_SPLITER)){
 				suffix = GlobalConstant.SQL_FIELD_SPLITER + suffix;
 			}
@@ -287,28 +316,5 @@ public class DataDictService implements InitializingBean, DbMsgTopicHandler{
 	public String supportTables() {
 		return StringUtils.join(table2aliasMap.keySet(), ",");
 	}
-
-	/*private class DataDictTask implements Runnable{
-		
-		private DataDictLoader loader;
-		
-		public DataDictTask(DataDictLoader loader) {
-			if(loader == null){
-				throw new BaseRuntimeException("ILLEGAL_PARAM", "loader cannot be null");
-			}
-			this.loader = loader;
-		}
-
-		@Override
-		public void run() {
-			Map<String, String> kvMap = loader.loadData();
-			if(kvMap != null){
-				String realNs = loader.getRealNs();
-				dataMap.put(realNs, kvMap);
-			}
-			LOG.debug(LOG.isDebugEnabled() ? "refresh data for " + loader.getRealNs() + " with size " + (kvMap == null ? 0 : kvMap.size()) : null);
-		}
-		
-	}*/
 	
 }

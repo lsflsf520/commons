@@ -1,5 +1,6 @@
 package com.xyz.tools.web.common.ftl;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -25,16 +26,16 @@ public class Value implements TemplateMethodModelEx{
 			throw new BaseRuntimeException("ILLEGAL_ARG", "namespace and key cannot be null");
 		}
 		String namespace = args.get(0).toString();
-		String key = "";
+//		String key = "";
+		Serializable[] currArgs = new Serializable[args.size() - 1];
 		if(args.size() >= 2){
-			String[] currArgs = new String[args.size() - 1];
 			for(int i = 1; i < args.size(); i++){
-				currArgs[i - 1] = args.get(i) == null ? "" : args.get(i).toString();
+				currArgs[i - 1] = args.get(i).toString();
 			}
-			key = dataDictService.buildKey(currArgs);
+//			key = dataDictService.buildKey(currArgs);
 		}
 		
-		return dataDictService.getValue(namespace, key);
+		return dataDictService.getValue(namespace, currArgs);
 	}
 	
 
