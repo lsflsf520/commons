@@ -66,7 +66,7 @@ public class TableDataDictLoader extends DataDictLoader {
 				}
 			}
 			
-			currCondSql = otherCondStr + (StringUtils.isBlank(currCondSql) ? "" : currCondSql);
+			currCondSql = otherCondStr + (StringUtils.isBlank(currCondSql) ? "" : " and " + currCondSql);
 		}
 		
 		return loadData(currCondSql);
