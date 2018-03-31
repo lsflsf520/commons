@@ -368,8 +368,11 @@ public class CodeGenPlug extends PluginAdapter {
     	}
     	
     	builder.append("\t\t\t<!--<if test=\"queryParam != null\">\n");
-    	builder.append("\t\t\t\t<if test=\"queryParam.startDate != null and queryParam.startDate != '' and queryParam.endDate != null and queryParam.endDate != ''\">\n");
-    	builder.append("\t\t\t\t\tand create_time between #{queryParam.startDate, jdbcType=VARCHAR} and #{queryParam.endDate, jdbcType=VARCHAR}\n");
+    	builder.append("\t\t\t\t<if test=\"queryParam.startDate != null and queryParam.startDate != '' \">\n");
+    	builder.append("\t\t\t\t\tand create_time &gt;= #{queryParam.startDate, jdbcType=VARCHAR} \n");
+    	builder.append("\t\t\t\t</if>\n");
+    	builder.append("\t\t\t\t<if test=\"queryParam.endDate != null and queryParam.endDate != ''\">\n");
+    	builder.append("\t\t\t\t\tand create_time &lt; #{queryParam.endDate, jdbcType=VARCHAR}\n");
     	builder.append("\t\t\t\t</if>\n");
     	builder.append("\t\t\t\t<if test=\"queryParam.keyword != null and queryParam.keyword != ''\">\n");
     	builder.append("\t\t\t\t\tand (name like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') or other_col like concat('%', #{queryParam.keyword, jdbcType=VARCHAR}, '%') )\n");
