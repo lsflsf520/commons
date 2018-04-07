@@ -1,6 +1,5 @@
 package com.xyz.tools.common.utils;
 
-
 import java.io.File;
 import java.net.URL;
 import java.util.Iterator;
@@ -26,12 +25,12 @@ import com.xyz.tools.common.exception.BaseRuntimeException;
  * @author lsf 2012-2-8 下午5:01:28
  */
 public final class BaseConfig {
-	
-	private BaseConfig(){
+
+	private BaseConfig() {
 	}
 
 	public enum FileName {
-		application
+		application, redis
 	}
 
 	private static final Map<FileName, Configuration> CONF_MAP = new ConcurrentHashMap<FileName, Configuration>(4);
@@ -45,14 +44,14 @@ public final class BaseConfig {
 	public synchronized static void init() {
 
 		FileName[] values = FileName.values();
-		//CONF_MAP.clear();
+		// CONF_MAP.clear();
 
 		for (FileName fileName : values) {
 			try {
 				String filePath = getPath(fileName + ".properties");
 				if (StringUtils.isBlank(filePath)) {
-					System.out.println("file '" + fileName
-							+ ".properties' not exists in classpath, then try to parse '" + fileName + ".xml'");
+					System.out.println("file '" + fileName + ".properties' not exists in classpath, then try to parse '"
+							+ fileName + ".xml'");
 					filePath = getPath(fileName + ".xml");
 					if (StringUtils.isBlank(filePath)) {
 						System.out.println("No properties file or xml file named '" + fileName
@@ -61,13 +60,13 @@ public final class BaseConfig {
 					}
 
 					CONF_MAP.put(fileName, new XMLConfiguration(filePath));
-					
+
 					System.out.println("found file '" + fileName + "'.xml in path '" + filePath + "'");
 					continue;
 				}
 
 				CONF_MAP.put(fileName, new PropertiesConfiguration(filePath));
-				
+
 				System.out.println("found file '" + fileName + "'.properties in path '" + filePath + "'");
 			} catch (ConfigurationException e) {
 				System.err.println(fileName + ".properties file parsed error. msg(" + e.getMessage() + ")");
@@ -83,8 +82,8 @@ public final class BaseConfig {
 			return fileName;
 		}
 
-		String fileSuffix = fileName.startsWith(File.separator) || fileName.startsWith("\\") ? fileName : File.separator
-				+ fileName;
+		String fileSuffix = fileName.startsWith(File.separator) || fileName.startsWith("\\") ? fileName
+				: File.separator + fileName;
 
 		String configDir = System.getProperty("project.config.dir");
 		filePath = configDir + fileSuffix;
@@ -131,16 +130,16 @@ public final class BaseConfig {
 
 		return parseInt(key, val, null);
 	}
-	
+
 	/**
 	 * 
 	 * @param key
 	 * @param defVal
 	 * @return
 	 */
-	public static int getInt(String key, int defVal){
+	public static int getInt(String key, int defVal) {
 		String val = getValue(key);
-		
+
 		return parseInt(key, val, defVal);
 	}
 
@@ -202,13 +201,13 @@ public final class BaseConfig {
 		if (RegexUtil.isInt(val)) {
 			return Integer.valueOf(val);
 		}
-		
-		if(defaultVal != null){
+
+		if (defaultVal != null) {
 			return defaultVal;
 		}
 
-		throw new BaseRuntimeException("ILLEGAL_DATA", "value '" + val + "' is not integer or not defined for key '" + key
-				+ "'");
+		throw new BaseRuntimeException("ILLEGAL_DATA",
+				"value '" + val + "' is not integer or not defined for key '" + key + "'");
 	}
 
 	/**
@@ -217,8 +216,7 @@ public final class BaseConfig {
 	 *            *.properties文件中的key
 	 * @param defaultVal
 	 *            在*.properties中找不到key所对应的值时，返回该值
-	 * @return 在FileName这个枚举类指定的所有配置文件中,挨个查找key的值,返回第一个找到的值.
-	 *         如果一个都没找到，则返回defaultVal
+	 * @return 在FileName这个枚举类指定的所有配置文件中,挨个查找key的值,返回第一个找到的值. 如果一个都没找到，则返回defaultVal
 	 */
 	public static String getValue(String key, String defaultVal) {
 
@@ -234,7 +232,7 @@ public final class BaseConfig {
 
 			String[] values = config.getStringArray(key);
 			if (values != null && values.length > 1) {
-				for(int index = 0; index < values.length; index++){
+				for (int index = 0; index < values.length; index++) {
 					values[index] = replaceVariables(values[index]);
 				}
 				value = StringUtils.join(values, ",");
@@ -243,36 +241,38 @@ public final class BaseConfig {
 				value = replaceVariables(value);
 			}
 			if (!StringUtils.isBlank(value)) {
-				// LOG.debug("find value for key("+key+") in config file '"+fileName+".properties'");
+				// LOG.debug("find value for key("+key+") in config file
+				// '"+fileName+".properties'");
 				return value;
 			}
 		}
 
 		return defaultVal;
 	}
-	
-	private static String replaceVariables(String value){
-		if(StringUtils.isNotBlank(value)){
+
+	private static String replaceVariables(String value) {
+		if (StringUtils.isNotBlank(value)) {
 			List<String> paramNames = RegexUtil.getParamNames(value);
-			if(!CollectionUtils.isEmpty(paramNames)){
-				for(String paramName : paramNames){
+			if (!CollectionUtils.isEmpty(paramNames)) {
+				for (String paramName : paramNames) {
 					String paramVal = getValue(paramName);
-					if(StringUtils.isNotBlank(paramVal)){
+					if (StringUtils.isNotBlank(paramVal)) {
 						value = RegexUtil.replaceParamName(value, paramName, paramVal);
 					}
 				}
 			}
 		}
-		
+
 		return value;
 	}
-	
+
 	/**
 	 * 根据前缀获取键值对信息, 其中的key不包含prefix
-	 * @param prefix 
-	 * @return 
-	 */ 
-	public static Map<String, String> getKvMapWithoutPrefix(String prefix){
+	 * 
+	 * @param prefix
+	 * @return
+	 */
+	public static Map<String, String> getKvMapWithoutPrefix(String prefix) {
 		Map<String, String> kvMap = new LinkedHashMap<>();
 		FileName[] fileNames = FileName.values();
 		for (FileName fileName : fileNames) {
@@ -285,7 +285,7 @@ public final class BaseConfig {
 			}
 
 			Iterator<String> itr = config.getKeys(prefix);
-			while(itr.hasNext()){
+			while (itr.hasNext()) {
 				String key = itr.next();
 				String[] values = config.getStringArray(key);
 				if (values != null && values.length > 1) {
@@ -293,9 +293,9 @@ public final class BaseConfig {
 				} else {
 					value = config.getString(key);
 				}
-				
+
 				String suffix = key.replace(prefix, "");
-				if(suffix.startsWith(".")){
+				if (suffix.startsWith(".")) {
 					suffix = suffix.substring(1);
 				}
 				kvMap.put(suffix, value);
@@ -304,13 +304,14 @@ public final class BaseConfig {
 
 		return kvMap;
 	}
-	
+
 	/**
 	 * 根据前缀获取键值对信息
+	 * 
 	 * @param prefix
 	 * @return
 	 */
-	public static Map<String, String> getKvMap(String prefix){
+	public static Map<String, String> getKvMap(String prefix) {
 		Map<String, String> kvMap = new LinkedHashMap<>();
 		FileName[] fileNames = FileName.values();
 		for (FileName fileName : fileNames) {
@@ -323,7 +324,7 @@ public final class BaseConfig {
 			}
 
 			Iterator<String> itr = config.getKeys(prefix);
-			while(itr.hasNext()){
+			while (itr.hasNext()) {
 				String key = itr.next();
 				String[] values = config.getStringArray(key);
 				if (values != null && values.length > 1) {
@@ -331,7 +332,7 @@ public final class BaseConfig {
 				} else {
 					value = config.getString(key);
 				}
-				
+
 				kvMap.put(key, value);
 			}
 		}

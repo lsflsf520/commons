@@ -25,90 +25,87 @@ public class CodeGenMain {
 		String[] arg = { "-configfile", config, "-overwrite" };
 		ShellRunner.main(arg);
 
-		renameMapper2Dao(); //将生成的Mapper类的名字修改成Dao结尾
-		
+		renameMapper2Dao(); // 将生成的Mapper类的名字修改成Dao结尾
+
 		move2TargetProject();
 	}
-	
-	public static String getConfigValue(String key){
+
+	public static String getConfigValue(String key) {
 		String propFile = BaseConfig.getPath("new/application.properties");
-		
+
 		try {
 			Configuration config = new PropertiesConfiguration(propFile);
 			return config.getString(key);
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
-	
-	private static void move2TargetProject(){
+
+	private static void move2TargetProject() {
 		String targetProjDir = getConfigValue("target.project.dir");
-		if(StringUtils.isEmpty(targetProjDir)){
+		if (StringUtils.isEmpty(targetProjDir)) {
 			System.out.println("target.project.dir has not defined in application.properties, move work has abandoned");
 			return;
 		}
-		
-		String genCodeDir = System.getProperty("user.dir") + "/"
-				+ getConfigValue("source.file.path");
-		
+
+		String genCodeDir = System.getProperty("user.dir") + "/" + getConfigValue("source.file.path");
+
 		String javaPkgRootPath = getConfigValue("java.package.rootpath");
-		
+
 		File srcFileDir = new File(genCodeDir);
-		
-		if(!srcFileDir.exists() || srcFileDir.listFiles().length <= 0){
+
+		if (!srcFileDir.exists() || srcFileDir.listFiles().length <= 0) {
 			System.out.println("no file exists in dir '" + srcFileDir.getAbsolutePath());
 			return;
 		}
-		
+
 		try {
 			File targetJavaDir = new File(targetProjDir + "/src/main/java");
 			FileUtils.copyDirectory(srcFileDir, targetJavaDir);
-//			FileUtils.moveDirectory(srcFileDir, new File(targetProjDir + "/src"));
+			// FileUtils.moveDirectory(srcFileDir, new File(targetProjDir + "/src"));
 			System.out.println("source code has copied to '" + targetProjDir + "/src/main/java'");
-			
-			File mapperDir = new File(targetJavaDir.getAbsolutePath() + "/" + javaPkgRootPath.replaceAll("\\.", "/") + "/mapper");
-			if(mapperDir.exists()){
+
+			File mapperDir = new File(
+					targetJavaDir.getAbsolutePath() + "/" + javaPkgRootPath.replaceAll("\\.", "/") + "/mapper");
+			if (mapperDir.exists()) {
 				File targetMapperDir = new File(targetProjDir + "/src/main/resources/mapper");
-				if(!targetMapperDir.exists()){
+				if (!targetMapperDir.exists()) {
 					targetMapperDir.mkdirs();
 				}
 				FileUtils.copyDirectory(mapperDir, targetMapperDir);
-//				FileUtils.moveDirectory(mapperDir, new File(targetProjDir + "/src/main/resources"));
-				System.out.println("mapper xml code dir has copied to '" + targetMapperDir.getAbsolutePath() +"'");
-				
+				// FileUtils.moveDirectory(mapperDir, new File(targetProjDir +
+				// "/src/main/resources"));
+				System.out.println("mapper xml code dir has copied to '" + targetMapperDir.getAbsolutePath() + "'");
+
 				FileUtils.deleteDirectory(mapperDir); // src/main/java中的mapper文件夹没用了，可以删掉
 			}
-			
+
 			FileUtils.deleteDirectory(new File(srcFileDir.getAbsolutePath() + "/" + javaPkgRootPath.split("\\.")[0])); // 生成代码的源目录也不需要了，可以删掉
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	private static void renameMapper2Dao() {
-		String genCodeDir = System.getProperty("user.dir") + "/"
-				+ getConfigValue("source.file.path");
+		String genCodeDir = System.getProperty("user.dir") + "/" + getConfigValue("source.file.path");
 		File genFileDir = new File(genCodeDir);
-		if(!genFileDir.exists()){
-			System.out.println("'" + genCodeDir + "' not exists." );
-			return ;
+		if (!genFileDir.exists()) {
+			System.out.println("'" + genCodeDir + "' not exists.");
+			return;
 		}
-		Collection<File> daoFiles = FileUtils.listFiles(genFileDir,
-				new String[] { "java" }, true);
+		Collection<File> daoFiles = FileUtils.listFiles(genFileDir, new String[] { "java" }, true);
 		for (File file : daoFiles) {
 			String filePath = file.getAbsolutePath();
 			if (filePath.endsWith("Mapper.java")) {
-				String newFilePath = filePath
-						.replace("Mapper.java", "Dao.java");
+				String newFilePath = filePath.replace("Mapper.java", "Dao.java");
 				File srcFile = new File(filePath);
 				try {
 					String content = FileUtils.readFileToString(srcFile);
 					String baseName = FilenameUtils.getBaseName(filePath);
-					content = content.replaceAll(baseName,
-							baseName.replace("Mapper", "Dao"));
+					content = content.replaceAll(baseName, baseName.replace("Mapper", "Dao"));
 					FileUtils.write(new File(newFilePath), content, "UTF-8");
 
 					srcFile.delete();

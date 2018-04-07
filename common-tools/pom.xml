@@ -320,8 +320,15 @@
 		<dependency>
 			<groupId>redis.clients</groupId>
 			<artifactId>jedis</artifactId>
-			<version>2.7.1</version>
+			<version>2.9.0</version>
 		</dependency>
+		
+		<!-- redis Spring 基于注解配置 -->     
+		<dependency>      
+		  <groupId>org.springframework.data</groupId>      
+		  <artifactId>spring-data-redis</artifactId>      
+		  <version>1.7.2.RELEASE</version>      
+		</dependency>  
 		
 		<!-- ehcache -->
 		<dependency>
@@ -423,13 +430,44 @@
             <version>1.0.8</version>
         </dependency>
         
-        <!-- 引入sharding-jdbc核心模块 -->
+        <!-- sharding-jdbc  https://github.com/shardingjdbc/sharding-jdbc.git -->
 		<dependency>
 		  <groupId>io.shardingjdbc</groupId>
 		  <artifactId>sharding-jdbc-core</artifactId>
-		  <version>2.0.1</version>
+		  <version>2.0.3</version>
 		</dependency>
+		<dependency>
+		    <groupId>io.shardingjdbc</groupId>
+		    <artifactId>sharding-jdbc-core-spring-namespace</artifactId>
+		    <version>2.0.3</version>
+		</dependency>
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api</artifactId>
+            <version>5.2.4</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+              </exclusion>
+            </exclusions>
+        </dependency>
 		
+		<dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-mp</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-pay</artifactId>
+            <version>2.9.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>weixin-java-miniapp</artifactId>
+            <version>2.9.0</version>
+        </dependency>
 		
 	</dependencies>
 	

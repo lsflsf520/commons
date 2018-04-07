@@ -10,7 +10,7 @@ import org.springframework.util.CollectionUtils;
 
 import com.xyz.tools.common.exception.BaseRuntimeException;
 import com.xyz.tools.common.utils.ThreadUtil;
-import com.xyz.tools.web.util.UserLoginUtil;
+import com.xyz.tools.web.util.UserLoginHelper;
 import com.xyz.tools.web.util.WebUtils;
 
 import freemarker.template.TemplateMethodModelEx;

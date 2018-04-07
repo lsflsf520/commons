@@ -52,13 +52,11 @@ public class WebUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(WebUtils.class);
 
 	private static final SimpleFilterProvider serializeAllFilterProvider = new SimpleFilterProvider()
-			.addFilter(DEFAULT_JSON_FILTER_NAME,
-					SimpleBeanPropertyFilter.serializeAllExcept());
+			.addFilter(DEFAULT_JSON_FILTER_NAME, SimpleBeanPropertyFilter.serializeAllExcept());
 
 	private static final ThreadLocal<SimpleBeanPropertyFilter> simpleBeanPropertyFilterContainer = new ThreadLocal<SimpleBeanPropertyFilter>();
 
-	public static int getParam(HttpServletRequest request, String param,
-			int defaultValue) {
+	public static int getParam(HttpServletRequest request, String param, int defaultValue) {
 
 		try {
 			String value = request.getParameter(param);
@@ -71,8 +69,7 @@ public class WebUtils {
 	/*
 	 * 从session取得值。
 	 */
-	public static Object getParamForSession(HttpServletRequest request,
-			String param, Object defaultValue) {
+	public static Object getParamForSession(HttpServletRequest request, String param, Object defaultValue) {
 
 		try {
 			Object value = request.getSession().getAttribute(param);
@@ -82,8 +79,7 @@ public class WebUtils {
 		return defaultValue;
 	}
 
-	public static long getParam(HttpServletRequest request, String param,
-			long defaultValue) {
+	public static long getParam(HttpServletRequest request, String param, long defaultValue) {
 
 		try {
 			String value = request.getParameter(param);
@@ -93,8 +89,7 @@ public class WebUtils {
 		return defaultValue;
 	}
 
-	public static boolean getParam(HttpServletRequest request, String param,
-			boolean defaultValue) {
+	public static boolean getParam(HttpServletRequest request, String param, boolean defaultValue) {
 
 		try {
 			String value = request.getParameter(param);
@@ -104,8 +99,7 @@ public class WebUtils {
 		return defaultValue;
 	}
 
-	public static float getParam(HttpServletRequest request, String param,
-			float defaultValue) {
+	public static float getParam(HttpServletRequest request, String param, float defaultValue) {
 
 		try {
 			String value = request.getParameter(param);
@@ -115,8 +109,7 @@ public class WebUtils {
 		return defaultValue;
 	}
 
-	public static String getParam(HttpServletRequest request, String param,
-			String defaultValue) {
+	public static String getParam(HttpServletRequest request, String param, String defaultValue) {
 
 		String value = request.getParameter(param);
 		if (value != null) {
@@ -145,16 +138,14 @@ public class WebUtils {
 		return null;
 	}
 
-	public static String getCookieValue(HttpServletRequest request,
-			String cookieName) {
+	public static String getCookieValue(HttpServletRequest request, String cookieName) {
 
 		Assert.notNull(request);
 		Assert.hasText(cookieName);
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null && cookies.length > 0) {
 			for (Cookie cookie : cookies) {
-				if (cookie != null && cookie.getName() != null
-						&& cookie.getName().equals(cookieName)) {
+				if (cookie != null && cookie.getName() != null && cookie.getName().equals(cookieName)) {
 					// 特殊字符串处理
 					String rValue = decode(cookie.getValue());
 					rValue = urlDecode(rValue);
@@ -170,23 +161,23 @@ public class WebUtils {
 	 * @param response
 	 * @param cookieName
 	 * @param value
-	 * @param cookieAge 以秒为单位
+	 * @param cookieAge
+	 *            以秒为单位
 	 */
-	public static void setCookieValue(HttpServletResponse response,
-			String cookieName, String value, int cookieAge) {
+	public static void setCookieValue(HttpServletResponse response, String cookieName, String value, int cookieAge) {
 
 		setCookieValue(response, cookieName, value, cookieAge, null, false);
 	}
-	
+
 	/**
 	 * 
 	 * @param response
 	 * @param cookieName
 	 * @param value
-	 * @param cookieAge 以秒为单位
+	 * @param cookieAge
+	 *            以秒为单位
 	 */
-	public static void setHttpOnlyCookie(HttpServletResponse response,
-			String cookieName, String value, int cookieAge){
+	public static void setHttpOnlyCookie(HttpServletResponse response, String cookieName, String value, int cookieAge) {
 		setCookieValue(response, cookieName, value, cookieAge, null, true);
 	}
 
@@ -204,7 +195,7 @@ public class WebUtils {
 	// cookie.setPath(cookiePath);
 	// }
 	// cookie.setMaxAge(cookieAge);
-	// LOG.debug("2 setCookieValue:  " + value);
+	// LOG.debug("2 setCookieValue: " + value);
 	// response.addCookie(cookie);
 	// }
 
@@ -213,12 +204,12 @@ public class WebUtils {
 	 * @param response
 	 * @param cookieName
 	 * @param value
-	 * @param cookieAge 以秒为单位
+	 * @param cookieAge
+	 *            以秒为单位
 	 * @param cookiePath
 	 * @param httpOnly
 	 */
-	public static void setCookieValue(HttpServletResponse response,
-			String cookieName, String value, int cookieAge,
+	public static void setCookieValue(HttpServletResponse response, String cookieName, String value, int cookieAge,
 			String cookiePath, boolean httpOnly) {
 
 		Assert.notNull(response);
@@ -226,27 +217,27 @@ public class WebUtils {
 		Assert.hasText(value);
 		// 特殊字符串处理
 		value = encode(value);
-//		value = urlEncode(value);
-//		response.setCharacterEncoding("UTF-8");
+		// value = urlEncode(value);
+		// response.setCharacterEncoding("UTF-8");
 		Cookie cookie = new Cookie(cookieName, value);
 		if (StringUtils.isBlank(cookiePath)) {
 			cookie.setPath("/");
 		} else {
 			cookie.setPath(cookiePath);
 		}
-		
+
 		String domain = getCookieDomain();
 		cookie.setDomain(domain);
 		cookie.setMaxAge(cookieAge);
-		//cookie.setHttpOnly(httpOnly);
+		// cookie.setHttpOnly(httpOnly);
 		response.addCookie(cookie);
 	}
-	
-	private static String getCookieDomain(){
+
+	private static String getCookieDomain() {
 		String domain = BaseConfig.getValue("cookie.root.domain", ".baoxianjie.net");
-		if(!BaseConfig.getBool("cookie.domain.fixed")){
+		if (!BaseConfig.getBool("cookie.domain.fixed")) {
 			String currDomain = ThreadUtil.getCurrDomain();
-			if(StringUtils.isNotBlank(currDomain)){
+			if (StringUtils.isNotBlank(currDomain)) {
 				domain = currDomain;
 			}
 		}
@@ -277,8 +268,7 @@ public class WebUtils {
 		}
 	}
 
-	public static void deleteCookie(HttpServletRequest request,
-			HttpServletResponse response, String... cookieNames) {
+	public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String... cookieNames) {
 
 		deleteCookie(null, request, response, cookieNames);
 	}
@@ -315,8 +305,7 @@ public class WebUtils {
 	 * @param cookieNames
 	 * @return
 	 */
-	public static void deleteCookie(String path,
-			HttpServletRequest request, HttpServletResponse response,
+	public static void deleteCookie(String path, HttpServletRequest request, HttpServletResponse response,
 			String... cookieNames) {
 
 		Assert.notNull(request);
@@ -326,7 +315,8 @@ public class WebUtils {
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null && cookies.length > 0) {
 			String domain = getCookieDomain();
-//			domain = StringUtils.isBlank(domain) ? BaseConfig.getValue("cookie.root.domain", ".baoxianjie.net") : domain;
+			// domain = StringUtils.isBlank(domain) ?
+			// BaseConfig.getValue("cookie.root.domain", ".baoxianjie.net") : domain;
 			for (Cookie cookie : cookies) {
 				for (String cookieName : cookieNames) {
 					Assert.hasText(cookieName);
@@ -343,22 +333,21 @@ public class WebUtils {
 		}
 	}
 
-	public static void deleteAllCookies(HttpServletRequest request,
-			HttpServletResponse response) {
+	public static void deleteAllCookies(HttpServletRequest request, HttpServletResponse response) {
 
 		Assert.notNull(request);
 		Cookie[] cookies = request.getCookies();
 		if (cookies != null && cookies.length > 0) {
 			for (Cookie cookie : cookies) {
-//				if (cookie.getDomain() != null
-//						&& cookie.getDomain().equals(domain)) {
-					cookie.setPath(StringUtils.isBlank(cookie.getPath()) ? "/" : cookie.getPath());
-					cookie.setMaxAge(0);
-					
-					String domain = getCookieDomain();
-					cookie.setDomain(domain);
-					response.addCookie(cookie);
-//				}
+				// if (cookie.getDomain() != null
+				// && cookie.getDomain().equals(domain)) {
+				cookie.setPath(StringUtils.isBlank(cookie.getPath()) ? "/" : cookie.getPath());
+				cookie.setMaxAge(0);
+
+				String domain = getCookieDomain();
+				cookie.setDomain(domain);
+				response.addCookie(cookie);
+				// }
 			}
 		}
 	}
@@ -370,12 +359,11 @@ public class WebUtils {
 	 * @param request
 	 * @param response
 	 */
-	public static void writeJson(Object obj, HttpServletRequest request,
-			HttpServletResponse response) {
+	public static void writeJson(Object obj, HttpServletRequest request, HttpServletResponse response) {
 
 		Map<Class, JsonSerializer> serializerMap = new HashMap<>();
 		serializerMap.put(ResultCodeIntf.class, new ResultCodeSerializer());
-		
+
 		writeJson(obj, request, response, serializerMap);
 
 		// try {
@@ -415,8 +403,7 @@ public class WebUtils {
 	 * @param response
 	 */
 	@SuppressWarnings("all")
-	public static void writeJson4ResultModel(Object obj,
-			HttpServletRequest request, HttpServletResponse response) {
+	public static void writeJson4ResultModel(Object obj, HttpServletRequest request, HttpServletResponse response) {
 
 		Map<Class, JsonSerializer> serializerMap = new HashMap<Class, JsonSerializer>();
 		serializerMap.put(ResultCodeIntf.class, new ResultCodeSerializer());
@@ -429,8 +416,7 @@ public class WebUtils {
 			Map<Class, JsonSerializer> serializerMap) {
 
 		try {
-			String callBack = ServletRequestUtils.getStringParameter(request,
-					"callback");
+			String callBack = ServletRequestUtils.getStringParameter(request, "callback");
 			response.setHeader("Content-Language", "zh-cn");
 			response.setHeader("Cache-Control", "no-cache");
 			response.setContentType("application/json; charset=UTF-8");
@@ -440,14 +426,15 @@ public class WebUtils {
 			if (obj instanceof String) {
 				result = obj.toString();
 			} else {
-				/*GsonBuilder builder = new GsonBuilder().setExclusionStrategies(new FieldIgnoreGsonStrategy());
-				if (serializerMap != null && !serializerMap.isEmpty()) {
-					for (Entry<Class, JsonSerializer> entry : serializerMap.entrySet()) {
-						builder.registerTypeHierarchyAdapter(entry.getKey(), entry.getValue());
-					}
-				}
-				result = builder.create().toJson(obj);*/
-				
+				/*
+				 * GsonBuilder builder = new GsonBuilder().setExclusionStrategies(new
+				 * FieldIgnoreGsonStrategy()); if (serializerMap != null &&
+				 * !serializerMap.isEmpty()) { for (Entry<Class, JsonSerializer> entry :
+				 * serializerMap.entrySet()) {
+				 * builder.registerTypeHierarchyAdapter(entry.getKey(), entry.getValue()); } }
+				 * result = builder.create().toJson(obj);
+				 */
+
 				result = JsonUtil.create().toJson(obj);
 			}
 
@@ -459,9 +446,7 @@ public class WebUtils {
 		} catch (IOException e) {
 			LOG.error(e.getMessage(), e);
 		} catch (ServletRequestBindingException e) {
-			LOG.error(
-					"[写json时候异常]" + obj + ", ip:" + WebUtils.getIpAddr(request),
-					e);
+			LOG.error("[写json时候异常]" + obj + ", ip:" + WebUtils.getIpAddr(request), e);
 		}
 	}
 
@@ -471,8 +456,7 @@ public class WebUtils {
 	 * @param obj
 	 * @param response
 	 */
-	public static void writeJsonForJPA(Object obj, HttpServletRequest request,
-			HttpServletResponse response) {
+	public static void writeJsonForJPA(Object obj, HttpServletRequest request, HttpServletResponse response) {
 
 		try {
 			ObjectMapper mapper = HibernateAwareObjectMapper.getInstance();
@@ -489,12 +473,10 @@ public class WebUtils {
 				errors.put("message", msg);
 				mapper.writeValue(response.getWriter(), errors);
 			} else {
-				SimpleBeanPropertyFilter simpleBeanPropertyFilter = simpleBeanPropertyFilterContainer
-						.get();
+				SimpleBeanPropertyFilter simpleBeanPropertyFilter = simpleBeanPropertyFilterContainer.get();
 				FilterProvider filters = null;
 				if (simpleBeanPropertyFilter != null) {
-					filters = new SimpleFilterProvider().addFilter(
-							DEFAULT_JSON_FILTER_NAME, simpleBeanPropertyFilter);
+					filters = new SimpleFilterProvider().addFilter(DEFAULT_JSON_FILTER_NAME, simpleBeanPropertyFilter);
 				} else {
 					filters = serializeAllFilterProvider;
 				}
@@ -543,8 +525,6 @@ public class WebUtils {
 		return StringUtils.isNotBlank(clientIp) ? clientIp.split(",")[0] : null;
 	}
 
-	
-
 	public static String getEquipType(HttpServletRequest request) {
 
 		String userAgent = request.getHeader("User-Agent");
@@ -568,142 +548,158 @@ public class WebUtils {
 
 	/**
 	 * 
+	 * @return 如果是app登录则返回“app”字符串，如果是网页登录，则返回“web”字符串
+	 */
+	public static String getClientType() {
+		if (ThreadUtil.isAppReq()) {
+			return "app";
+		} else if (ThreadUtil.isWxClient()) {
+			return "wx";
+		} else if (ThreadUtil.isMobileClient()) {
+			return "mob";
+		}
+
+		return "web";
+	}
+
+	/**
+	 * 
 	 * @param request
 	 * @return 如果当前请求为ajax请求，返回true；否则返回false
 	 */
 	public static boolean isAjax(HttpServletRequest request) {
 		String flag = request.getHeader("X-Requested-With");
-		if(StringUtils.isBlank(flag)){
+		if (StringUtils.isBlank(flag)) {
 			flag = request.getParameter("X-Requested-With");
 		}
 
-		return ("XMLHttpRequest"
-				.equals(flag));
+		return ("XMLHttpRequest".equals(flag));
 	}
-	
+
 	/**
 	 * 使用@ControllerAdvice的拦截器可以用到
+	 * 
 	 * @param request
 	 * @return
 	 */
-	public static boolean isAjax(WebRequest request){
+	public static boolean isAjax(WebRequest request) {
 		String flag = request.getHeader("X-Requested-With");
-		if(StringUtils.isBlank(flag)){
+		if (StringUtils.isBlank(flag)) {
 			flag = request.getParameter("X-Requested-With");
 		}
 
-		return ("XMLHttpRequest"
-				.equals(flag));
+		return ("XMLHttpRequest".equals(flag));
 	}
 
 	public static boolean isMobile(HttpServletRequest request) {
 
 		String ua = request.getHeader("user-agent");
 		// return true;
-//		return StringUtils.isNotBlank(ua)
-//				&& (ua.contains("Android") || ua.contains("iPad") || ua
-//						.contains("Linux"));
+		// return StringUtils.isNotBlank(ua)
+		// && (ua.contains("Android") || ua.contains("iPad") || ua
+		// .contains("Linux"));
 		return RegexUtil.isMobileClient(ua);
 	}
-	
+
 	/**
 	 * 判断是否为微信客户端
+	 * 
 	 * @param request
 	 * @return
 	 */
-	public static boolean isWxClient(HttpServletRequest request){
+	public static boolean isWxClient(HttpServletRequest request) {
 		String ua = request.getHeader("user-agent");
-		if(StringUtils.isBlank(ua)){
+		if (StringUtils.isBlank(ua)) {
 			return false;
 		}
-		
+
 		return ua.toLowerCase().indexOf("micromessenger") >= 0;
 	}
-	
+
 	/**
 	 * 
 	 * @param request
 	 * @param response
 	 * @param loginUrl
 	 * @param refererKeyName
-	 * @param needEncode 是否需要对当前url进行encode之后再追加到 loginUrl 后边
+	 * @param needEncode
+	 *            是否需要对当前url进行encode之后再追加到 loginUrl 后边
 	 * @return
 	 * @throws IOException
 	 */
-	public static String buildRedirectUrl(HttpServletRequest request, HttpServletResponse response, String loginUrl, String refererKeyName, boolean needEncode) throws IOException {
+	public static String buildRedirectUrl(HttpServletRequest request, HttpServletResponse response, String loginUrl,
+			String refererKeyName, boolean needEncode) throws IOException {
 		String requestUrl = getCurrParamUrl(request);
 		requestUrl = response.encodeURL(requestUrl);
 		loginUrl = response.encodeURL(loginUrl);
-		
+
 		String encodeUrl = requestUrl;
-		if(needEncode){
+		if (needEncode) {
 			encodeUrl = urlEncode(requestUrl);
 			encodeUrl = urlEncode(encodeUrl);
 		}
 
 		return addParam(loginUrl, StringUtils.isBlank(refererKeyName) ? "referer" : refererKeyName, encodeUrl);
 	}
-	
-	public static String buildRedirectUrl(HttpServletRequest request, HttpServletResponse response, String loginUrl) throws IOException {
 
-//		String queryStr = StringUtils.isNotBlank(request.getQueryString()) ? "?"
-//				+ request.getQueryString()
-//				: "";
+	public static String buildRedirectUrl(HttpServletRequest request, HttpServletResponse response, String loginUrl)
+			throws IOException {
+
+		// String queryStr = StringUtils.isNotBlank(request.getQueryString()) ? "?"
+		// + request.getQueryString()
+		// : "";
 		return buildRedirectUrl(request, response, loginUrl, "referer", true);
 	}
-	
+
 	/**
 	 * 获取当前request完整URI，带参数
+	 * 
 	 * @param request
 	 * @return
 	 */
 	public static String getCurrParamUri(HttpServletRequest request) {
-        String queryStr = StringUtils.isNotBlank(request.getQueryString()) ? "?"
-				+ request.getQueryString()
-				: "";
-				
+		String queryStr = StringUtils.isNotBlank(request.getQueryString()) ? "?" + request.getQueryString() : "";
+
 		return request.getServletPath() + queryStr;
 	}
-	
+
 	/**
 	 * 获取当前request完整URL，带参数
 	 * 
 	 * @param request
 	 * @return
 	 */
-	public static String getCurrParamUrl(HttpServletRequest request){
-		String queryStr = StringUtils.isNotBlank(request.getQueryString()) ? "?"
-				+ request.getQueryString()
-				: "";
+	public static String getCurrParamUrl(HttpServletRequest request) {
+		String queryStr = StringUtils.isNotBlank(request.getQueryString()) ? "?" + request.getQueryString() : "";
 		return request.getRequestURL().toString() + queryStr;
 	}
-	
-	public static String parseRedirectUrl(HttpServletRequest request, boolean needDecode, String... excludeUriFlags){
+
+	public static String parseRedirectUrl(HttpServletRequest request, boolean needDecode, String... excludeUriFlags) {
 		String referer = request.getParameter("referer");
-		if(StringUtils.isBlank(referer)){
+		if (StringUtils.isBlank(referer)) {
 			referer = request.getHeader("referer");
-			if(StringUtils.isNotBlank(referer)){
+			if (StringUtils.isNotBlank(referer)) {
 				referer = urlEncode(referer);
 			}
 		}
-		if(StringUtils.isNotBlank(referer) && excludeUriFlags != null && excludeUriFlags.length > 0){
-			for(String exludeUriFlag : excludeUriFlags){
-				if(referer.contains(exludeUriFlag)){
+		if (StringUtils.isNotBlank(referer) && excludeUriFlags != null && excludeUriFlags.length > 0) {
+			for (String exludeUriFlag : excludeUriFlags) {
+				if (referer.contains(exludeUriFlag)) {
 					referer = "/";
 					break;
 				}
 			}
 		}
-		
+
 		return StringUtils.isBlank(referer) || "/".equals(referer) ? "/" : (needDecode ? urlDecode(referer) : referer);
 	}
-	
+
 	public static boolean isStaticRes(String uri, Set<String> extendNames) {
-		if(uri.startsWith("/static")){
+		if (uri.startsWith("/static")) {
 			return true;
 		}
 
-		if(!CollectionUtils.isEmpty(extendNames)){
+		if (!CollectionUtils.isEmpty(extendNames)) {
 			for (String suffix : extendNames) {
 				if (uri.endsWith(suffix)) {
 					return true;
@@ -713,39 +709,40 @@ public class WebUtils {
 
 		return false;
 	}
-	
+
 	/**
 	 * 将参数name=value增加到url后边
+	 * 
 	 * @param url
 	 * @param name
 	 * @param value
 	 * @return
 	 */
-	public static String addParam(String url, String name, String value){
-		if(StringUtils.isNotBlank(url) && StringUtils.isNotBlank(name) && StringUtils.isNotBlank(value)){
+	public static String addParam(String url, String name, String value) {
+		if (StringUtils.isNotBlank(url) && StringUtils.isNotBlank(name) && StringUtils.isNotBlank(value)) {
 			url = url + (url.contains("?") ? "&" : "?") + name + "=" + value;
 		}
-		
+
 		return url;
 	}
-	
-	public static String urlDecode(String url){
+
+	public static String urlDecode(String url) {
 		try {
 			return URLDecoder.decode(url, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("url:" + url + ",errorMsg:" +e.getMessage(), e);
+			LOG.error("url:" + url + ",errorMsg:" + e.getMessage(), e);
 		}
-		
+
 		return url;
 	}
-	
-	public static String urlEncode(String url){
+
+	public static String urlEncode(String url) {
 		try {
 			return URLEncoder.encode(url, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("url:" + url + ",errorMsg:" +e.getMessage(), e);
+			LOG.error("url:" + url + ",errorMsg:" + e.getMessage(), e);
 		}
-		
+
 		return url;
 	}
 
@@ -759,21 +756,17 @@ public class WebUtils {
 		return json.replaceAll("\\&", "\"").replaceAll("\\$", ",");
 	}
 
-	public static String getRequestJsonString(HttpServletRequest request)
-	{
+	public static String getRequestJsonString(HttpServletRequest request) {
 
 		StringBuilder sb = new StringBuilder();
-		try
-		{
+		try {
 			BufferedReader reader = request.getReader();
 			char[] buff = new char[1024];
 			int len;
-			while ((len = reader.read(buff)) != -1)
-			{
+			while ((len = reader.read(buff)) != -1) {
 				sb.append(buff, 0, len);
 			}
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return sb.toString();

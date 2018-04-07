@@ -4,31 +4,38 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.xyz.tools.cache.constant.DefaultJedisKeyNS;
-import com.xyz.tools.cache.redis.ShardJedisTool;
+import com.xyz.tools.cache.redis.SpringJedisTool;
 import com.xyz.tools.common.exception.BaseRuntimeException;
+import com.xyz.tools.common.utils.LogUtils;
 
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
 
 @Component("NRSubmit")
-public class NoRepeatSubmit implements TemplateMethodModelEx {
+public class NoRepeatSubmit implements TemplateMethodModelEx, ApplicationContextAware {
 
 	public final static String NR_SUBMIT_NAME = "_nrsubmit_";
 	public final static String NRS_VERSION_NAME = "_nrs_version_";
 
-//	private final static String VALID_VAL = "1";
-//	public final static String INVALID_VAL = "0";
+	private SpringJedisTool springJedisTool;
+
+	// private final static String VALID_VAL = "1";
+	// public final static String INVALID_VAL = "0";
 
 	@Override
 	public Object exec(List args) throws TemplateModelException {
-		if (CollectionUtils.isEmpty(args) || args.get(0) == null || (!(args.get(0) instanceof Number) && !(args.get(0) instanceof String)) ) {
+		if (CollectionUtils.isEmpty(args) || args.get(0) == null
+				|| (!(args.get(0) instanceof Number) && !(args.get(0) instanceof String))) {
 			// 如果参数为空，则代表用户想使用防重复提交
 			String uuid = UUID.randomUUID().toString();
-			long version = ShardJedisTool.incr(DefaultJedisKeyNS.nrsubmit, uuid);
+			long version = springJedisTool.incr(DefaultJedisKeyNS.nrsubmit, uuid);
 			return buildNoRepeatText(uuid, version);
 		}
 		if (args.size() != 2) {
@@ -45,10 +52,10 @@ public class NoRepeatSubmit implements TemplateMethodModelEx {
 			throw new BaseRuntimeException("ILLEGAL_PARAM", "not exist enum '" + secondParam + "'");
 		}
 		String key = formType + "!" + firstParam.trim();
-		String val = ShardJedisTool.get(DefaultJedisKeyNS.nrsubmit, key);
+		String val = springJedisTool.get(DefaultJedisKeyNS.nrsubmit, key);
 		long version = 0;
-		if(StringUtils.isBlank(val)){
-			version = ShardJedisTool.incr(DefaultJedisKeyNS.nrsubmit, key);
+		if (StringUtils.isBlank(val)) {
+			version = springJedisTool.incr(DefaultJedisKeyNS.nrsubmit, key);
 		} else {
 			version = Long.valueOf(val);
 		}
@@ -61,7 +68,7 @@ public class NoRepeatSubmit implements TemplateMethodModelEx {
 				+ "<input type='hidden' name='" + NRS_VERSION_NAME + "' value='" + version + "'/>";
 	}
 
-	public static boolean isVersionConflictType(String nrsubmitkey) {
+	public boolean isVersionConflictType(String nrsubmitkey) {
 		if (StringUtils.isNotBlank(nrsubmitkey)) {
 			for (FormType formType : FormType.values()) {
 				if (nrsubmitkey.startsWith(formType.name())) {
@@ -72,20 +79,29 @@ public class NoRepeatSubmit implements TemplateMethodModelEx {
 		return false;
 	}
 
-	public static boolean isValid(String key, String version) {
-		if(StringUtils.isBlank(key) || StringUtils.isBlank(version)){
+	public boolean isValid(String key, String version) {
+		if (StringUtils.isBlank(key) || StringUtils.isBlank(version)) {
 			return false;
 		}
-		long nextVersion = ShardJedisTool.incr(DefaultJedisKeyNS.nrsubmit, key.trim());
+		long nextVersion = springJedisTool.incr(DefaultJedisKeyNS.nrsubmit, key.trim());
 		boolean result = version.trim().equals("" + (nextVersion - 1));
-		if(!result){
-			//如果校验不成功，需要把版本号还原，注意：这个地方有事务性的风险，不过理论上发生的几率特小，可以忽略不计
-			ShardJedisTool.decr(DefaultJedisKeyNS.nrsubmit, key.trim());
+		if (!result) {
+			// 如果校验不成功，需要把版本号还原，注意：这个地方有事务性的风险，不过理论上发生的几率特小，可以忽略不计
+			springJedisTool.decr(DefaultJedisKeyNS.nrsubmit, key.trim());
 		}
 		return result;
 	}
 
 	private static enum FormType {
 		AGENT_COMPANY
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext context) throws BeansException {
+		try {
+			springJedisTool = context.getBean(SpringJedisTool.class);
+		} catch (Exception e) {
+			LogUtils.warn("not found bean for SpringJedisTool in ApplicationContext");
+		}
 	}
 }

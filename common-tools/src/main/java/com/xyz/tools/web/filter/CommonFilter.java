@@ -33,7 +33,7 @@ import com.xyz.tools.common.utils.IPUtil;
 import com.xyz.tools.common.utils.LogUtils;
 import com.xyz.tools.common.utils.RandomUtil;
 import com.xyz.tools.common.utils.ThreadUtil;
-import com.xyz.tools.web.util.UserLoginUtil;
+import com.xyz.tools.web.util.UserLoginHelper;
 import com.xyz.tools.web.util.WebUtils;
 
 /**
@@ -46,11 +46,11 @@ public class CommonFilter implements Filter {
 	private final static Logger LOG = LoggerFactory.getLogger(CommonFilter.class);
 
 	private AntPathMatcher urlMatcher = new AntPathMatcher();
-	
+
 	private final Set<String> extendNames = new LinkedHashSet<String>();
-	
+
 	private final Set<String> noRedirect2MobileUris = new HashSet<>();
-	
+
 	private final Set<String> excludePatterns = new LinkedHashSet<>();
 
 	@Override
@@ -73,27 +73,27 @@ public class CommonFilter implements Filter {
 				extendNames.add((suffix.startsWith(".") ? suffix : "." + suffix).trim());
 			}
 		}
-		
+
 		String noredirectUriStr = filterConfig.getInitParameter("noRedirect2MobileUris");
-		if(StringUtils.isNotBlank(noredirectUriStr)){
+		if (StringUtils.isNotBlank(noredirectUriStr)) {
 			String[] noredirectUris = noredirectUriStr.split(",");
-			for(String uri : noredirectUris){
+			for (String uri : noredirectUris) {
 				noRedirect2MobileUris.add(uri.trim());
 			}
 		}
-		
+
 		String excludePattern = filterConfig.getInitParameter("excludePattern");
-		if(StringUtils.isNotBlank(excludePattern)){
+		if (StringUtils.isNotBlank(excludePattern)) {
 			String[] patterns = excludePattern.split(",");
-			for(String pattern : patterns){
+			for (String pattern : patterns) {
 				excludePatterns.add(pattern.trim());
 			}
 		}
 	}
-	
+
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response,
-			FilterChain chain) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		String servletUri = httpRequest.getServletPath();
@@ -102,18 +102,18 @@ public class CommonFilter implements Filter {
 			chain.doFilter(request, response);
 			return;
 		}
-		String currUrl = ThreadUtil.getCurrUrl(); //这个当前的url有可能会被UrlRewrite重写，所以先记录一下
-//		ThreadUtil.printContent();
-		ThreadUtil.clear(); //每次进入当前环境，先清空当前ThreadLocal中的数据
-		if(StringUtils.isBlank(currUrl)){
+		String currUrl = ThreadUtil.getCurrUrl(); // 这个当前的url有可能会被UrlRewrite重写，所以先记录一下
+		// ThreadUtil.printContent();
+		ThreadUtil.clear(); // 每次进入当前环境，先清空当前ThreadLocal中的数据
+		if (StringUtils.isBlank(currUrl)) {
 			currUrl = WebUtils.getCurrParamUrl(httpRequest);
 		}
 		ThreadUtil.setCurrUrl(currUrl);
-		
+
 		String token = httpRequest.getHeader(ThreadUtil.TOKEN_KEY);
 		if (StringUtils.isBlank(token)) {
-			token = UserLoginUtil.getToken(httpRequest);
-			if("true".equals(BaseConfig.getValue("api.web.flag"))) {
+			token = UserLoginHelper.getToken(httpRequest);
+			if ("true".equals(BaseConfig.getValue("api.web.flag"))) {
 				ThreadUtil.setAppReqFlag();
 			}
 		} else {
@@ -125,40 +125,42 @@ public class CommonFilter implements Filter {
 		// }
 		String traceMsgId = httpRequest.getHeader(ThreadUtil.TRACE_MSG_ID);
 		ThreadUtil.getTraceMsgId(traceMsgId);
-		
+
 		ThreadUtil.setCurrDomain(request.getServerName());
 		int serverPort = request.getServerPort();
 		ThreadUtil.setCurrPort(serverPort);
-		String sid = getSid(httpRequest, (HttpServletResponse)response);
+		String sid = getSid(httpRequest, (HttpServletResponse) response);
 		ThreadUtil.setSid(sid);
 		ThreadUtil.setToken(token);
-		
+
 		String srcProjectName = httpRequest.getHeader(ThreadUtil.SRC_PROJECT_KEY);
 		ThreadUtil.setSrcProject(srcProjectName);
 		ThreadUtil.setSrcIP(WebUtils.getClientIp(httpRequest));
-		ThreadUtil.put(ThreadUtil.RESPONSE_KEY, (HttpServletResponse)response);
+		ThreadUtil.put(ThreadUtil.RESPONSE_KEY, (HttpServletResponse) response);
 		ThreadUtil.put(ThreadUtil.REQUEST_KEY, httpRequest);
 		ThreadUtil.setCurrUri(servletUri);
 		ThreadUtil.setAppReq(WebUtils.isWxClient(httpRequest));
 		ThreadUtil.setWxClient(WebUtils.isMobile(httpRequest));
-//		ThreadUtil.putIfAbsent(ThreadUtil.IS_MOBILE_CLIENT, WebUtils.isMobile(httpRequest));
+		// ThreadUtil.putIfAbsent(ThreadUtil.IS_MOBILE_CLIENT,
+		// WebUtils.isMobile(httpRequest));
 
-		if(!ThreadUtil.isAppReq() && ThreadUtil.isMobileClient() && ThreadUtil.isPCDomain() && "true".equals(BaseConfig.getValue("auto.pc.to.h5", "false"))){
-			boolean isNoRedirectUri = false; //先检测一下是否是无需往m站跳转的uri
-			for(String noRedirectUri : noRedirect2MobileUris){
-				if(urlMatcher.match(noRedirectUri, servletUri)){
+		if (!ThreadUtil.isAppReq() && ThreadUtil.isMobileClient() && ThreadUtil.isPCDomain()
+				&& "true".equals(BaseConfig.getValue("auto.pc.to.h5", "false"))) {
+			boolean isNoRedirectUri = false; // 先检测一下是否是无需往m站跳转的uri
+			for (String noRedirectUri : noRedirect2MobileUris) {
+				if (urlMatcher.match(noRedirectUri, servletUri)) {
 					isNoRedirectUri = true;
 					break;
 				}
 			}
-			
-			if(!isNoRedirectUri){
+
+			if (!isNoRedirectUri) {
 				String domainPrefix = ThreadUtil.getDomainPrefix();
 				String h5url = buildH5Url(domainPrefix);
 				LogUtils.info("redirect from %s to %s", ThreadUtil.getCurrUrl(), h5url);
-				((HttpServletResponse)response).sendRedirect(h5url);
-				
-				return ;
+				((HttpServletResponse) response).sendRedirect(h5url);
+
+				return;
 			}
 		}
 
@@ -169,24 +171,25 @@ public class CommonFilter implements Filter {
 			httpRequest.setAttribute("_SID_", sid);
 			httpRequest.setAttribute("STATIC_DOMAIN", GlobalConstant.STATIC_DOMAIN);
 			httpRequest.setAttribute("RES_VERSION", GlobalConstant.RES_VERSION);
-//			httpRequest.setAttribute("IS_WEB_ADMIN", GlobalConstant.IS_WEB_ADMIN);
-//			httpRequest.setAttribute("IMG_DOMAIN", GlobalConstant.IMG_DOMAIN);
+			// httpRequest.setAttribute("IS_WEB_ADMIN", GlobalConstant.IS_WEB_ADMIN);
+			// httpRequest.setAttribute("IMG_DOMAIN", GlobalConstant.IMG_DOMAIN);
 			httpRequest.setAttribute("UPFILE_DOMAIN", GlobalConstant.UPFILE_DOMAIN);
 			httpRequest.setAttribute("ACL_DOMAIN", GlobalConstant.ACL_DOMAIN);
 			httpRequest.setAttribute("SERVLET_URI", servletUri);
 			httpRequest.setAttribute("CURR_URL", currUrl);
-			httpRequest.setAttribute("CURR_NO_PARAM_URL", StringUtils.isBlank(currUrl) ? null : currUrl.split("\\?")[0]);
+			httpRequest.setAttribute("CURR_NO_PARAM_URL",
+					StringUtils.isBlank(currUrl) ? null : currUrl.split("\\?")[0]);
 			httpRequest.setAttribute("IS_WX_CLIENT", ThreadUtil.isWxClient());
 			httpRequest.setAttribute("IS_MOBILE_CLIENT", ThreadUtil.isMobileClient());
 			httpRequest.setAttribute("REFERER", httpRequest.getHeader("referer"));
 			httpRequest.setAttribute("nocdn", true);
-			
+
 			String userAgentStr = httpRequest.getHeader("user-agent");
-			if(userAgentStr != null){
+			if (userAgentStr != null) {
 				boolean isIos = userAgentStr.contains("iPhone");
 				httpRequest.setAttribute("userAgent", isIos);
 			}
-			
+
 			chain.doFilter(request, response);
 		} catch (Throwable th) {
 			code = "500";
@@ -203,92 +206,104 @@ public class CommonFilter implements Filter {
 			}
 
 			String extraMsg = "time:" + DateUtil.getCurrentDateTimeStr() + ",userId:" + ThreadUtil.getUid()
-			+ ",loginName:" + ThreadUtil.getShowName()
-			+ ",serverIP:" + IPUtil.getLocalIp() + ",params:" + getParams(httpRequest);
-			
-			LOG.error("uri:" + servletUri + "," + extraMsg + "," + th.getMessage(), th);
-			
+					+ ",loginName:" + ThreadUtil.getShowName() + ",serverIP:" + IPUtil.getLocalIp() + ",params:"
+					+ getParams(httpRequest);
+			if ("NOT_LOGON".equals(resultCode)) {
+				LogUtils.warn("not logon, context:%s", extraMsg);
+			} else {
+				LogUtils.error("uri: %s" + ",extraMsg: %s" + ",errMsg: %s", th, servletUri, extraMsg, th.getMessage());
+			}
+
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
-			if (WebUtils.isAjax(httpRequest)) {
-				WebUtils.writeJson(new ResultModel(resultCode, msg), httpRequest,
-						httpResponse);
+			if (WebUtils.isAjax(httpRequest) || ThreadUtil.isAppReq()) {
+				WebUtils.writeJson(new ResultModel(resultCode, msg), httpRequest, httpResponse);
 			} else {
 				String errorUrl = BaseConfig.getValue("exception.redirect.url", "/error/500.do");
-				if(GlobalResultCode.NO_PRIVILEGE.name().equals(resultCode)){
+				if (GlobalResultCode.NO_PRIVILEGE.name().equals(resultCode)) {
 					errorUrl = BaseConfig.getValue("nopriv.redirect.url", "/error/401.do");
+				} else if ("NOT_LOGON".equals(resultCode)) {
+					errorUrl = BaseConfig.getValue("project.loginpage.url", "/sys/port/loginPage.do");
 				}
-				if(th instanceof MaxUploadSizeExceededException || th.getCause() instanceof MaxUploadSizeExceededException){
+				if (th instanceof MaxUploadSizeExceededException
+						|| th.getCause() instanceof MaxUploadSizeExceededException) {
 					httpResponse.sendRedirect(errorUrl);
-				} else{
-					/*httpRequest.setAttribute("errorMsg", new BaseRuntimeException(resultCode, "uri:" + servletUri + ","
-							+ extraMsg, th));
-					httpRequest.setAttribute("friendlyMsg", msg);
-					httpRequest.setAttribute("messageId", ThreadUtil.getTraceMsgId());
-					httpRequest.setAttribute("srcUrl", servletUri);
-					httpRequest.getRequestDispatcher(errorUrl).forward(httpRequest, httpResponse);*/
-					
+				} else {
+					/*
+					 * httpRequest.setAttribute("errorMsg", new BaseRuntimeException(resultCode,
+					 * "uri:" + servletUri + "," + extraMsg, th));
+					 * httpRequest.setAttribute("friendlyMsg", msg);
+					 * httpRequest.setAttribute("messageId", ThreadUtil.getTraceMsgId());
+					 * httpRequest.setAttribute("srcUrl", servletUri);
+					 * httpRequest.getRequestDispatcher(errorUrl).forward(httpRequest,
+					 * httpResponse);
+					 */
+
 					httpResponse.sendRedirect(errorUrl);
 				}
 			}
 
 		} finally {
-			LogUtils.logXN(WebUtils.getCurrParamUrl(httpRequest) + " " + code + " " + (WebUtils.isAjax(httpRequest) ? "ajax " : "http ")
-					       + (StringUtils.isBlank(ThreadUtil.getSid()) ? "" : "sid(" + ThreadUtil.getSid() + ")")
-		                   + (StringUtils.isBlank(ThreadUtil.getToken()) ? "" : "tk(" + ThreadUtil.getToken() + ")")
-		                   + (ThreadUtil.getUid() == null ? "" : "uid(" + ThreadUtil.getUid() + ")" )
-		                   + (StringUtils.isBlank(UserLoginUtil.getClientType()) ? "" : "ctp(" + UserLoginUtil.getClientType() + ")")
-		                   + (StringUtils.isBlank(httpRequest.getHeader("referer")) ? "" : "ref(" + httpRequest.getHeader("referer") + ")"), start);
+			LogUtils.logXN(WebUtils.getCurrParamUrl(httpRequest) + " " + code + " "
+					+ (WebUtils.isAjax(httpRequest) ? "ajax " : "http ")
+					+ (StringUtils.isBlank(ThreadUtil.getSid()) ? "" : "sid(" + ThreadUtil.getSid() + ")")
+					+ (StringUtils.isBlank(ThreadUtil.getToken()) ? "" : "tk(" + ThreadUtil.getToken() + ")")
+					+ (ThreadUtil.getUid() == null ? "" : "uid(" + ThreadUtil.getUid() + ")")
+					+ (StringUtils.isBlank(WebUtils.getClientType()) ? "" : "ctp(" + WebUtils.getClientType() + ")")
+					+ (StringUtils.isBlank(httpRequest.getHeader("referer")) ? ""
+							: "ref(" + httpRequest.getHeader("referer") + ")"),
+					start);
 			ThreadUtil.clear();
 		}
 
 	}
-	
-	private boolean isExcludeUrl(String servletUri){
-		for(String pattern : excludePatterns){
-			if(urlMatcher.match(pattern, servletUri)){
+
+	private boolean isExcludeUrl(String servletUri) {
+		for (String pattern : excludePatterns) {
+			if (urlMatcher.match(pattern, servletUri)) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
-	private String buildH5Url(String domainPrefix){
+
+	private String buildH5Url(String domainPrefix) {
 		String currUrl = ThreadUtil.getCurrUrl();
 		String currDomain = ThreadUtil.getCurrDomain();
-		
-		String h5domain = BaseConfig.getValue("h5.domain."+domainPrefix, BaseConfig.getValue("h5.domain"));
-		if(StringUtils.isNotBlank(h5domain)){
+
+		String h5domain = BaseConfig.getValue("h5.domain." + domainPrefix, BaseConfig.getValue("h5.domain"));
+		if (StringUtils.isNotBlank(h5domain)) {
 			return currUrl.replace(currDomain, h5domain);
-		} 
-		
-//		currDomain = currDomain.replace("wd.csai.cn", "csai.cn");
-		if("www".equals(domainPrefix) && currDomain.startsWith("www.")){
+		}
+
+		// currDomain = currDomain.replace("wd.csai.cn", "csai.cn");
+		if ("www".equals(domainPrefix) && currDomain.startsWith("www.")) {
 			return currUrl.replace(currDomain, currDomain.replace("www.", "m."));
 		}
-		
+
 		return currUrl.replace(currDomain, "m." + currDomain);
 	}
-	
+
 	/**
 	 * 返回当前会话的唯一ID
+	 * 
 	 * @param request
 	 * @return
 	 */
-	private String getSid(HttpServletRequest request, HttpServletResponse response){
+	private String getSid(HttpServletRequest request, HttpServletResponse response) {
 		String sidName = "_sid_";
 		String sid = WebUtils.getCookieValue(request, sidName);
-		if(StringUtils.isBlank(sid)){
+		if (StringUtils.isBlank(sid)) {
 			String clientIp = ThreadUtil.getSrcIP();
 			String equipType = WebUtils.getEquipType(request);
 			long currTime = System.currentTimeMillis();
 			int randCode = RandomUtil.rand(100000);
-			
+
 			sid = EncryptTools.encryptByMD5(clientIp + equipType + currTime + randCode);
-			
+
 			WebUtils.setHttpOnlyCookie(response, sidName, sid, -1);
 		}
-		
+
 		return sid;
 	}
 
