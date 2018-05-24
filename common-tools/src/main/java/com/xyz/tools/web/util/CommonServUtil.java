@@ -33,7 +33,7 @@ public class CommonServUtil {
 			formParams.put("params", StringUtils.join(params, ","));
 		}
 
-		return RestClientUtil.doPost(GlobalConstant.UPFILE_DOMAIN + "/sms/send.do", formParams,
+		return RestClientUtil.doPost(GlobalConstant.BASE_SERVICE_DOMAIN + "/sms/send.do", formParams,
 				ResultModel.class);
 	}
 
@@ -69,7 +69,7 @@ public class CommonServUtil {
 			}
 		}
 
-		return RestClientUtil.doPost(GlobalConstant.UPFILE_DOMAIN + "/email/tmpl/send.do", formParams,
+		return RestClientUtil.doPost(GlobalConstant.BASE_SERVICE_DOMAIN + "/email/tmpl/send.do", formParams,
 				ResultModel.class);
 	}
 	
@@ -105,7 +105,7 @@ public class CommonServUtil {
 			}
 		}
 		
-		return RestClientUtil.doPost(GlobalConstant.UPFILE_DOMAIN + "/email/content/send.do", formParams,
+		return RestClientUtil.doPost(GlobalConstant.BASE_SERVICE_DOMAIN + "/email/content/send.do", formParams,
 				ResultModel.class);
 	}
 	
@@ -119,7 +119,7 @@ public class CommonServUtil {
 	 * @return
 	 */
 	public static ResultModel getIPAddr(String ip){
-		ResultModel resultModel = RestClientUtil.doGet(GlobalConstant.UPFILE_DOMAIN + "/ip/s.do?ip={ip}", ResultModel.class, ip);
+		ResultModel resultModel = RestClientUtil.doGet(GlobalConstant.BASE_SERVICE_DOMAIN + "/ip/s.do?ip={ip}", ResultModel.class, ip);
 		
 		return resultModel;
 	}

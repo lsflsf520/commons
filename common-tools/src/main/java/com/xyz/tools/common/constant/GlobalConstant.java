@@ -19,13 +19,17 @@ public class GlobalConstant {
 	
 	public static final boolean IS_MGR = "true".equalsIgnoreCase(BaseConfig.getValue("env.mgr_web", "false"));
 	
-	public static final String STATIC_DOMAIN = "http://" + BaseConfig.getValue("static.resource.domain", "");
+	//静态资源访问域名
+	public static final String STATIC_DOMAIN = BaseConfig.getValue("static.resource.domain", "http://static.csaimall.com");
 	
+	//静态资源版本号
 	public static final String RES_VERSION = BaseConfig.getValue("static.resource.version", "1.0.0");
 	
-	public static final String UPFILE_DOMAIN = "http://" + BaseConfig.getValue("static.upfile.domain", "upfile-test.baoxianjie.net");
+	//公共底层基础服务访问域名
+	public static final String BASE_SERVICE_DOMAIN = BaseConfig.getValue("base.service.domain", "http://base.csaimall.com");
 	
-	public static final String ACL_DOMAIN = "http://" + BaseConfig.getValue("csai.acl.domain", "mgr.csaimall.com");
+	//权限校验域名
+	public static final String ACL_DOMAIN = BaseConfig.getValue("acl.domain", "http://acl.csaimall.com");
 	
 	public static final String SQL_FIELD_SPLITER = ",";
 	

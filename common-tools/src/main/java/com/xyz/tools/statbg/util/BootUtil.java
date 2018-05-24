@@ -1,5 +1,6 @@
 package com.xyz.tools.statbg.util;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import com.xyz.tools.statbg.FlowData;
 import com.xyz.tools.statbg.GlobalParam;
 import com.xyz.tools.statbg.Stat;
 import com.xyz.tools.statbg.data.SingleValueData;
+
 
 /**
  * @author shangfeng
@@ -52,7 +54,7 @@ public class BootUtil {
 			try {
 				outputList = stat.execute(paramMap);
 			} catch (Exception ex) {
-				LOG.error("exec for stat(" + stat + ") with paramMap("
+				LOG.error("exec for stat(" + stat +"," + stat.getOrderNO() + ") with paramMap("
 						+ paramMap + ") failure. serverIP:" + IPUtil.getLocalIp(), ex);
 				if (stat.isExitWhenException()) {
 					break;
@@ -138,19 +140,6 @@ public class BootUtil {
 
 		Map<String, List<FlowData>> globalParamMap = new HashMap<String, List<FlowData>>();
 
-		String[] globalParamNames = context
-				.getBeanNamesForType(GlobalParam.class);
-		if (globalParamNames != null && globalParamNames.length > 0) {
-			for (String globalParam : globalParamNames) {
-				GlobalParam<Serializable> param = (GlobalParam<Serializable>) context
-						.getBean(globalParam);
-				List<FlowData> singleDataList = new ArrayList<FlowData>();
-				singleDataList.add(new SingleValueData(param.generateParam()));
-
-				globalParamMap.put(globalParam, singleDataList);
-			}
-		}
-
 		// 定义好命令行参数，如果命令行参数的名称和globalParamNames中有相同的名称，则优先使用命令行对应的参数
 		for (int index = 0; index < args.length; index = index + 2) {
 			if (index + 1 < args.length) {
@@ -166,6 +155,23 @@ public class BootUtil {
 				globalParamMap.put(argName, singleDataList);
 			}
 		}
+		
+		String[] globalParamNames = context
+				.getBeanNamesForType(GlobalParam.class);
+		if (globalParamNames != null && globalParamNames.length > 0) {
+			for (String globalParam : globalParamNames) {
+				if(!globalParamMap.containsKey(globalParam)) {
+					GlobalParam<Serializable> param = (GlobalParam<Serializable>) context
+							.getBean(globalParam);
+					List<FlowData> singleDataList = new ArrayList<FlowData>();
+					singleDataList.add(new SingleValueData(param.generateParam(Collections.unmodifiableMap(globalParamMap))));
+					
+					globalParamMap.put(globalParam, singleDataList);
+				}
+			}
+		}
+
+		
 
 		return globalParamMap;
 	}

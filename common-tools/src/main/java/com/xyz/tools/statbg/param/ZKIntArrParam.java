@@ -1,8 +1,12 @@
 package com.xyz.tools.statbg.param;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
+import com.xyz.tools.statbg.FlowData;
 import com.xyz.tools.statbg.GlobalParam;
+
 
 public class ZKIntArrParam implements GlobalParam<ArrayList<Integer>>{
 	
@@ -11,7 +15,7 @@ public class ZKIntArrParam implements GlobalParam<ArrayList<Integer>>{
 	private String key;
 
 	@Override
-	public ArrayList<Integer> generateParam() {
+	public ArrayList<Integer> generateParam(Map<String, List<FlowData>> globalParamMap) {
 		/*ArrayList<Integer> schoolIdList = new ArrayList<Integer>();
 		int[] schoolIds = ConfigOnZk.getIntArr(path, key);
 		for(int i=0;i<schoolIds.length;i++){

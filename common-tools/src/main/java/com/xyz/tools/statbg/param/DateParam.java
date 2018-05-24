@@ -1,12 +1,18 @@
 package com.xyz.tools.statbg.param;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import com.xyz.tools.common.utils.DateUtil;
+import com.xyz.tools.common.utils.RegexUtil;
+import com.xyz.tools.statbg.FlowData;
 import com.xyz.tools.statbg.GlobalParam;
+
 
 
 /**
@@ -21,7 +27,15 @@ public class DateParam implements GlobalParam<String>{
 	private String pattern;
 	
 	@Override
-	public String generateParam() {
+	public String generateParam(Map<String, List<FlowData>> globalParamMap) {
+		List<FlowData> params = globalParamMap.get("time");
+		if(!CollectionUtils.isEmpty(params)) {
+			Object val = params.get(0).getData(null);
+			if(val != null && RegexUtil.isInt(val.toString())){
+				this.time = Integer.valueOf(val.toString());
+			}
+		}
+		
 		Date date = DateUtil.timeAdd(new Date(), time, timeUnit == null ? TimeUnit.DAYS : timeUnit);
 		return DateUtil.formatDate(date, StringUtils.isBlank(pattern) ? DateUtil.FORMAT_DATE : pattern);
 	}

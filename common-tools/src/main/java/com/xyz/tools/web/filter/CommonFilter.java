@@ -16,13 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.util.NestedServletException;
 
 import com.xyz.tools.common.bean.ResultModel;
+import com.xyz.tools.common.constant.ClientType;
 import com.xyz.tools.common.constant.GlobalConstant;
 import com.xyz.tools.common.constant.GlobalResultCode;
 import com.xyz.tools.common.exception.BaseRuntimeException;
@@ -42,8 +41,6 @@ import com.xyz.tools.web.util.WebUtils;
  *
  */
 public class CommonFilter implements Filter {
-
-	private final static Logger LOG = LoggerFactory.getLogger(CommonFilter.class);
 
 	private AntPathMatcher urlMatcher = new AntPathMatcher();
 
@@ -120,9 +117,11 @@ public class CommonFilter implements Filter {
 			ThreadUtil.setAppReqFlag(); // 在此设置app请求标识
 		}
 
-		// if (!WebUtils.PC.equals(WebUtils.getEquipType(httpRequest))) {
-		// ThreadUtil.setAppReqFlag(); // 在此设置app请求标识
-		// }
+		ClientType clientType = WebUtils.getClientType(httpRequest);
+		ThreadUtil.setClientType(clientType);
+		if(!ThreadUtil.isAppReq() && ClientType.isApp(clientType)) {
+			ThreadUtil.setAppReqFlag(); // 在此设置app请求标识
+		}
 		String traceMsgId = httpRequest.getHeader(ThreadUtil.TRACE_MSG_ID);
 		ThreadUtil.getTraceMsgId(traceMsgId);
 
@@ -171,9 +170,8 @@ public class CommonFilter implements Filter {
 			httpRequest.setAttribute("_SID_", sid);
 			httpRequest.setAttribute("STATIC_DOMAIN", GlobalConstant.STATIC_DOMAIN);
 			httpRequest.setAttribute("RES_VERSION", GlobalConstant.RES_VERSION);
-			// httpRequest.setAttribute("IS_WEB_ADMIN", GlobalConstant.IS_WEB_ADMIN);
-			// httpRequest.setAttribute("IMG_DOMAIN", GlobalConstant.IMG_DOMAIN);
-			httpRequest.setAttribute("UPFILE_DOMAIN", GlobalConstant.UPFILE_DOMAIN);
+			httpRequest.setAttribute("IS_WEB_ADMIN", GlobalConstant.IS_MGR);
+			httpRequest.setAttribute("BASE_SERVICE_DOMAIN", GlobalConstant.BASE_SERVICE_DOMAIN);
 			httpRequest.setAttribute("ACL_DOMAIN", GlobalConstant.ACL_DOMAIN);
 			httpRequest.setAttribute("SERVLET_URI", servletUri);
 			httpRequest.setAttribute("CURR_URL", currUrl);
@@ -181,8 +179,7 @@ public class CommonFilter implements Filter {
 					StringUtils.isBlank(currUrl) ? null : currUrl.split("\\?")[0]);
 			httpRequest.setAttribute("IS_WX_CLIENT", ThreadUtil.isWxClient());
 			httpRequest.setAttribute("IS_MOBILE_CLIENT", ThreadUtil.isMobileClient());
-			httpRequest.setAttribute("REFERER", httpRequest.getHeader("referer"));
-			httpRequest.setAttribute("nocdn", true);
+			httpRequest.setAttribute("referer", httpRequest.getHeader("referer"));
 
 			String userAgentStr = httpRequest.getHeader("user-agent");
 			if (userAgentStr != null) {
@@ -243,15 +240,12 @@ public class CommonFilter implements Filter {
 			}
 
 		} finally {
-			LogUtils.logXN(WebUtils.getCurrParamUrl(httpRequest) + " " + code + " "
-					+ (WebUtils.isAjax(httpRequest) ? "ajax " : "http ")
-					+ (StringUtils.isBlank(ThreadUtil.getSid()) ? "" : "sid(" + ThreadUtil.getSid() + ")")
-					+ (StringUtils.isBlank(ThreadUtil.getToken()) ? "" : "tk(" + ThreadUtil.getToken() + ")")
-					+ (ThreadUtil.getUid() == null ? "" : "uid(" + ThreadUtil.getUid() + ")")
-					+ (StringUtils.isBlank(WebUtils.getClientType()) ? "" : "ctp(" + WebUtils.getClientType() + ")")
-					+ (StringUtils.isBlank(httpRequest.getHeader("referer")) ? ""
-							: "ref(" + httpRequest.getHeader("referer") + ")"),
-					start);
+			LogUtils.logXN(WebUtils.getCurrParamUrl(httpRequest) + " " + code + " " + (WebUtils.isAjax(httpRequest) ? "ajax " : "http ")
+				       + (StringUtils.isBlank(ThreadUtil.getSid()) ? "" : "sid(" + ThreadUtil.getSid() + ")")
+	                   + (StringUtils.isBlank(ThreadUtil.getToken()) ? "" : "tk(" + ThreadUtil.getToken() + ")")
+	                   + (ThreadUtil.getUid() == null ? "" : "uid(" + ThreadUtil.getUid() + ")" )
+	                   + (ThreadUtil.getClientType() == null ? "" : "ctp(" + ThreadUtil.getClientType() + ")")
+	                   + (StringUtils.isBlank(httpRequest.getHeader("referer")) ? "" : "ref(" + httpRequest.getHeader("referer") + ")"), start);
 			ThreadUtil.clear();
 		}
 
@@ -295,11 +289,11 @@ public class CommonFilter implements Filter {
 		String sid = WebUtils.getCookieValue(request, sidName);
 		if (StringUtils.isBlank(sid)) {
 			String clientIp = ThreadUtil.getSrcIP();
-			String equipType = WebUtils.getEquipType(request);
+			ClientType clientType = ThreadUtil.getClientType();
 			long currTime = System.currentTimeMillis();
 			int randCode = RandomUtil.rand(100000);
 
-			sid = EncryptTools.encryptByMD5(clientIp + equipType + currTime + randCode);
+			sid = EncryptTools.encryptByMD5(clientIp + clientType + currTime + randCode);
 
 			WebUtils.setHttpOnlyCookie(response, sidName, sid, -1);
 		}

@@ -1,13 +1,17 @@
 package com.xyz.tools.statbg.param;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 
 import com.xyz.tools.common.exception.BaseRuntimeException;
 import com.xyz.tools.common.utils.DateUtil;
+import com.xyz.tools.statbg.FlowData;
 import com.xyz.tools.statbg.GlobalParam;
+
 
 /**
  * @author shangfeng
@@ -21,7 +25,7 @@ public class WeekParam implements GlobalParam<String> {
 	private String pattern = DateUtil.FORMAT_DATE;
 
 	@Override
-	public String generateParam() {
+	public String generateParam(Map<String, List<FlowData>> globalParamMap) {
 
 		Date dt = DateUtil.timeAddByDays(new Date(), days);
 

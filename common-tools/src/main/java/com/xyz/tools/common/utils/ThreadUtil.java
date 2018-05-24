@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xyz.tools.common.bean.IUser;
+import com.xyz.tools.common.constant.ClientType;
+import com.xyz.tools.common.constant.EquipType;
 import com.xyz.tools.common.constant.GlobalConstant;
 
 public class ThreadUtil {
@@ -51,7 +53,8 @@ public class ThreadUtil {
 	private final static String CLIENT_PROJECT_NAME = "cpn";
 	private final static String SRC_IP = "si";
 	private final static String CLIENT_IP = "ci";
-	private final static String EQUIP_TYPE = "et"; // 设备类型，比如pc、android、iPhone、ipod、ipad等
+	private final static String EQUIP_TYPE = "et"; // 设备类型
+	private final static String CLIENT_TYPE_KEY = "clientType"; //
 	
 	private final static String REQ_CONTENT = "rcontent"; //存储request body内容的key
 	
@@ -121,12 +124,20 @@ public class ThreadUtil {
 		return get(CURR_URL);
 	}
 	
-	public static String getEquipType() {
+	public static EquipType getEquipType() {
 		return get(EQUIP_TYPE);
 	}
 	
-	public static void setEquipType(String equipType) {
+	public static void setEquipType(EquipType equipType) {
 		putIfAbsent(EQUIP_TYPE, equipType);
+	}
+	
+	public static ClientType getClientType() {
+		return get(CLIENT_TYPE_KEY);
+	}
+	
+	public static void setClientType(ClientType clientType) {
+		putIfAbsent(CLIENT_TYPE_KEY, clientType);
 	}
 
 	public static void setCurrUri(String servletUri) {

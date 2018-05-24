@@ -7,6 +7,6 @@ public interface JedisKeyNS extends CacheNameSpace {
 	public static final long SLEEP_TIME = 200;// 读写失败时重试时间间隔 单位 毫秒
 	public static final String RDWNM_CODE = "RDWNM-500";
 
-	// public JedisKeyType getKeyType();
+	public JedisKeyType getKeyType();
 
 }

@@ -1,11 +1,17 @@
 package com.xyz.tools.statbg.param;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import com.xyz.tools.common.utils.DateUtil;
+import com.xyz.tools.common.utils.RegexUtil;
+import com.xyz.tools.statbg.FlowData;
 import com.xyz.tools.statbg.GlobalParam;
+
 
 /**
  * @author shangfeng
@@ -26,11 +32,18 @@ public class MonthParam implements GlobalParam<String> {
 	 */
 
 	@Override
-	public String generateParam() {
+	public String generateParam(Map<String, List<FlowData>> globalParamMap) {
 
 		Date dt = DateUtil.timeAddByDays(new Date(), days);
 		Date date = DateUtil.parseDate((DateUtil.getFirstDayOfMonth(dt)));
 
+		List<FlowData> params = globalParamMap.get("monthNum");
+		if(!CollectionUtils.isEmpty(params)) {
+			Object val = params.get(0).getData(null);
+			if(val != null && RegexUtil.isInt(val.toString())){
+				this.monthNum = Integer.valueOf(val.toString());
+			}
+		}
 		date = DateUtil.timeAddByMonth(date, monthNum);
 
 		return DateUtil.formatDate(date, pattern);

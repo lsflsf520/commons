@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.xyz.tools.cache.constant.DefaultJedisKeyNS;
 import com.xyz.tools.cache.redis.SpringJedisTool;
 import com.xyz.tools.common.bean.IUser;
+import com.xyz.tools.common.constant.ClientType;
 import com.xyz.tools.common.constant.GlobalConstant;
 import com.xyz.tools.common.exception.BaseRuntimeException;
 import com.xyz.tools.common.utils.EncryptTools;
@@ -65,7 +66,7 @@ public class UserLoginHelper implements ApplicationContextAware {
 			throw new BaseRuntimeException("ILLEGAL_PARAM", "系统异常，请重试或联系管理员！", "session信息不合法");
 		}
 		String clientIp = ThreadUtil.getSrcIP();
-		String equipType = ThreadUtil.getEquipType();
+		ClientType equipType = ThreadUtil.getClientType();
 		long currTime = System.currentTimeMillis();
 		int randCode = RandomUtil.rand(100000);
 
@@ -81,12 +82,9 @@ public class UserLoginHelper implements ApplicationContextAware {
 			springJedisTool.expire(DefaultJedisKeyNS.uid2t, getUidKey(currUser.getUid() + ""), WEEK_SECONDS);
 		}
 
-		// Map<String, Object> uidTkMap = new HashMap<String, Object>();
-		String clientType = WebUtils.getClientType();
-		// uidTkMap.put(clientType + CLIENT_TOKEN_SUFFIX, token);
-		// uidTkMap.put(clientType + CLIENT_EQUIP_SUFFIX, equipType);
-
-		saveUid2Token(currUser.getUid() + "", clientType, token);
+//		EquipType clientType = WebUtils.getEquipType2(request);
+//
+//		saveUid2Token(currUser.getUid() + "", clientType, token);
 
 		ThreadUtil.clear();
 		ThreadUtil.setToken(token);
@@ -133,10 +131,10 @@ public class UserLoginHelper implements ApplicationContextAware {
 	public void removeSession(HttpServletRequest request, HttpServletResponse response) {
 		if (StringUtils.isNotBlank(ThreadUtil.getToken())) {
 			try {
-				long userId = ThreadUtil.getUid();
-				String clientType = WebUtils.getClientType();
-				springJedisTool.hdel(DefaultJedisKeyNS.uid2t, getUidKey(userId + ""), clientType);
-				springJedisTool.del(DefaultJedisKeyNS.session, ThreadUtil.getToken()); // 先删除缓存中的session信息
+//				long userId = ThreadUtil.getUid();
+//				String clientType = WebUtils.getClientType();
+//				springJedisTool.hdel(DefaultJedisKeyNS.uid2t, getUidKey(userId + ""), clientType);
+//				springJedisTool.del(DefaultJedisKeyNS.session, ThreadUtil.getToken()); // 先删除缓存中的session信息
 			} catch (BaseRuntimeException e) {
 				LogUtils.error("already logout", e, "");
 			}
@@ -167,7 +165,7 @@ public class UserLoginHelper implements ApplicationContextAware {
 	 */
 	public String getKOMsgKey() {
 
-		String ctype = WebUtils.getClientType();
+		ClientType ctype = ThreadUtil.getClientType();
 		return getKOMsgKey(ctype);
 	}
 
@@ -176,7 +174,7 @@ public class UserLoginHelper implements ApplicationContextAware {
 	 * @param ctype
 	 * @return 根据指定的ctype字符串，组装成存储被kickoff原因的key
 	 */
-	private String getKOMsgKey(String ctype) {
+	private String getKOMsgKey(ClientType ctype) {
 
 		return ctype + "_ko";
 	}
