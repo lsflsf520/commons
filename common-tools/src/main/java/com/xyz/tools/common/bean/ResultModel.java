@@ -25,7 +25,7 @@ public class ResultModel {
 	/**
 	 * 主业务处理结果
 	 */
-	private Object model;
+	private Object model = new HashMap<>();
 
 	/**
 	 * 在返回结果中，除了实际处理返回的model外，还可能需要一些其它的辅助参数(比如是否为无线请求，是否为可信的爬虫请求等)，
@@ -66,14 +66,21 @@ public class ResultModel {
 		this(resultCodeBean.getCode(), resultCodeBean.getFriendlyMsg());
 	}
 
+	@SuppressWarnings("all")
 	public ResultModel(Object model) {
 		if (model == null) {
 			throw new BaseRuntimeException("ILLEGAL_PARAM", "ResultModel不支持NULL参数");
 		}
-		this.model = model;
-		if ((this.model != null && !(this.model instanceof Boolean)) || (Boolean) (this.model)) {
+		
+		if ((model != null && !(model instanceof Boolean)) || (Boolean) (model)) {
 			this.resultCode = GlobalResultCode.SUCCESS.getCode();
 			this.resultMsg = GlobalResultCode.SUCCESS.getFriendlyMsg();
+		}
+		
+        if(model instanceof Number || model instanceof String || model instanceof Boolean){
+			((HashMap)this.model).put("data", model);
+		} else {
+			this.model = model;
 		}
 	}
 
