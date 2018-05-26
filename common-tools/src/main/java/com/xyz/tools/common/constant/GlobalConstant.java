@@ -19,6 +19,10 @@ public class GlobalConstant {
 	
 	public static final boolean IS_MGR = "true".equalsIgnoreCase(BaseConfig.getValue("env.mgr_web", "false"));
 	
+    public static final String PROJECT_PC_DOMAIN = BaseConfig.getValue("pc.project.domain");
+	
+	public static final String PROJECT_H5_DOMAIN = BaseConfig.getValue("h5.project.domain"); 
+	
 	//静态资源访问域名
 	public static final String STATIC_DOMAIN = BaseConfig.getValue("static.resource.domain", "http://static.csaimall.com");
 	
